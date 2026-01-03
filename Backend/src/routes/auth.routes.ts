@@ -49,16 +49,6 @@ router.post('/signup', async (req: Request, res: Response) => {
         role: validatedData.role,
         emailVerifyToken,
         emailVerifyExpires
-      },
-      select: {
-        id: true,
-        employeeId: true,
-        email: true,
-        companyName: true,
-        phoneNumber: true,
-        role: true,
-        emailVerified: true,
-        createdAt: true
       }
     });
 

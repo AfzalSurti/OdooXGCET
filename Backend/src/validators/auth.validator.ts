@@ -9,7 +9,7 @@ const passwordSchema = z.string()
 
 export const signUpSchema = z.object({
   employeeId: z.string().min(1, 'Employee ID is required').trim(),
-  email: z.string().email('Invalid email format').toLowerCase().trim(),
+  email: z.email('Invalid email format').toLowerCase().trim(),
   password: passwordSchema,
   companyName: z.string().min(1, 'Company name is required').trim(),
   phoneNumber: z.string()

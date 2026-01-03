@@ -1,7 +1,7 @@
 import { z } from 'zod';
 export declare const signUpSchema: z.ZodObject<{
     employeeId: z.ZodString;
-    email: z.ZodString;
+    email: z.ZodEmail;
     password: z.ZodString;
     companyName: z.ZodString;
     phoneNumber: z.ZodString;
