@@ -72,8 +72,11 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  employeeId: 'employeeId',
   email: 'email',
   passwordHash: 'passwordHash',
+  companyName: 'companyName',
+  phoneNumber: 'phoneNumber',
   role: 'role',
   emailVerified: 'emailVerified',
   emailVerifyToken: 'emailVerifyToken',

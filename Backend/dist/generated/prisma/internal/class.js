@@ -15,14 +15,14 @@ const config = {
     "clientVersion": "7.2.0",
     "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
     "activeProvider": "postgresql",
-    "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Test {\n  id   String @id @default(uuid())\n  name String\n}\n",
+    "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum Role {\n  EMPLOYEE\n  HR\n}\n\nmodel User {\n  id           String @id @default(uuid())\n  employeeId   String @unique\n  email        String @unique\n  passwordHash String\n  companyName  String\n  phoneNumber  String\n\n  role Role @default(EMPLOYEE)\n\n  emailVerified      Boolean   @default(false)\n  emailVerifyToken   String?\n  emailVerifyExpires DateTime?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
     "runtimeDataModel": {
         "models": {},
         "enums": {},
         "types": {}
     }
 };
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Test\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}");
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"employeeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"companyName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"Role\"},{\"name\":\"emailVerified\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"emailVerifyToken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailVerifyExpires\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}");
 async function decodeBase64AsWasm(wasmBase64) {
     const { Buffer } = await import('node:buffer');
     const wasmArray = Buffer.from(wasmBase64, 'base64');
