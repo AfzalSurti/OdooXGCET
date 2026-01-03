@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { mockEmployees, mockEmployeeInsights, mockAttendanceRecords } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { PageShell } from '@/components/layout/PageShell';
 
 function TrendIcon({ trend }: { trend: 'up' | 'down' | 'stable' }) {
   if (trend === 'up') return <TrendingUp className="w-4 h-4 text-stable" />;
@@ -119,14 +121,30 @@ function CheckInTimeline() {
 
 export default function EmployeeDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
+  const isEmployeeView = user?.role === 'employee';
   const employee = mockEmployees.find(e => e.id === id);
+
+  // Extra safety: even if route guards change, employees should only view their own profile.
+  if (isEmployeeView && user && id && id !== user.id) {
+    return (
+      <div className="p-6">
+        <p>Not authorized</p>
+        <Link to="/dashboard">
+          <Button variant="outline" className="mt-4">Back to Dashboard</Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (!employee) {
     return (
       <div className="p-6">
         <p>Employee not found</p>
-        <Link to="/employees">
-          <Button variant="outline" className="mt-4">Back to Employees</Button>
+        <Link to={isEmployeeView ? "/dashboard" : "/employees"}>
+          <Button variant="outline" className="mt-4">
+            {isEmployeeView ? "Back to Dashboard" : "Back to Employees"}
+          </Button>
         </Link>
       </div>
     );
@@ -139,12 +157,20 @@ export default function EmployeeDetail() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      {/* Back Button */}
-      <Link to="/employees" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Employees
-      </Link>
+    <PageShell
+      title={employee.name}
+      description={`${employee.employeeId} • ${employee.department} • ${employee.position}`}
+      maxWidthClassName="max-w-6xl"
+      actions={
+        <Link
+          to={isEmployeeView ? "/dashboard" : "/employees"}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {isEmployeeView ? "Back to Dashboard" : "Back to Employees"}
+        </Link>
+      }
+    >
 
       {/* AI Intelligence Summary - Top Card */}
       <Card className="card-tier-2 section-fade-in">
@@ -283,6 +309,6 @@ export default function EmployeeDetail() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageShell>
   );
 }

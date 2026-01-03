@@ -1,8 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { mockEmployees } from '@/lib/mock-data';
+import { PageShell } from '@/components/layout/PageShell';
 
 export default function Payroll() {
+  const { user } = useAuth();
+  const isHR = user?.role === 'hr' || user?.role === 'admin';
+
   const salaryBreakdown = [
     { label: 'Basic Salary', amount: 50000 },
     { label: 'Housing Allowance (HRA)', amount: 15000 },
@@ -21,21 +27,65 @@ export default function Payroll() {
   const totalDeductions = deductions.reduce((sum, item) => sum + item.amount, 0);
   const netSalary = grossSalary - totalDeductions;
 
+  if (isHR) {
+    return (
+      <PageShell
+        title="Payroll"
+        description="Payroll overview for all employees with salary details."
+        maxWidthClassName="max-w-6xl"
+      >
+        <Card className="card-tier-2 section-fade-in">
+          <CardHeader>
+            <CardTitle className="text-lg">January 2024 Payroll</CardTitle>
+            <CardDescription>{mockEmployees.length} employees</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {mockEmployees.map((emp, idx) => (
+                <div
+                  key={emp.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 border-b border-border/50 last:border-0"
+                  style={{ animationDelay: `${idx * 20}ms` }}
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{emp.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                      {emp.employeeId} • {emp.department}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="text-right">
+                      <p className="font-semibold tracking-data">Net: ₹{netSalary.toLocaleString('en-IN')}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Gross ₹{grossSalary.toLocaleString('en-IN')} • Ded. ₹{totalDeductions.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Download className="w-4 h-4" />
+                      Payslip
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </PageShell>
+    );
+  }
+
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 section-fade-in">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Payroll</h1>
-          <p className="text-muted-foreground mt-1.5">
-            View your salary breakdown and download payslips
-          </p>
-        </div>
+    <PageShell
+      title="Payroll"
+      description="View your salary breakdown and download payslips."
+      actions={
         <Button className="gap-2">
           <Download className="w-4 h-4" />
           Download Payslip
         </Button>
-      </div>
+      }
+      maxWidthClassName="max-w-4xl"
+    >
 
       {/* Current Month Summary */}
       <Card className="card-tier-3 section-fade-in">
@@ -121,6 +171,6 @@ export default function Payroll() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageShell>
   );
 }

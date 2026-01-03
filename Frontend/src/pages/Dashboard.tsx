@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { mockDashboardStats, mockLeaveRequests, mockEmployees } from '@/lib/mock-data';
 import { Link } from 'react-router-dom';
+import { PageShell } from '@/components/layout/PageShell';
 
 function StatCard({ 
   title, 
@@ -124,21 +125,20 @@ export default function Dashboard() {
   
   const pendingRequests = mockLeaveRequests.filter(r => r.status === 'pending');
   const attentionEmployees = mockEmployees.filter(e => e.status !== 'stable');
+  const stableCount = mockEmployees.filter(e => e.status === 'stable').length;
+  const attentionCount = mockEmployees.filter(e => e.status === 'attention').length;
+  const criticalCount = mockEmployees.filter(e => e.status === 'critical').length;
+  const totalEmployees = mockEmployees.length || 1;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="section-fade-in">
-        <h1 className="text-2xl font-semibold text-foreground">
-          {isHR ? 'HR Dashboard' : 'My Dashboard'}
-        </h1>
-        <p className="text-muted-foreground mt-1.5">
-          {isHR 
-            ? "A clear view of your organization's workforce health and activity" 
-            : `Welcome back, ${user?.name?.split(' ')[0]}. Here's what matters today`
-          }
-        </p>
-      </div>
+    <PageShell
+      title={isHR ? 'HR Dashboard' : 'My Dashboard'}
+      description={
+        isHR
+          ? "A calm, accurate view of workforce health and operational signals."
+          : `Welcome back, ${user?.name?.split(' ')[0]}. Here’s what matters today.`
+      }
+    >
 
       {/* Stats Grid */}
       {isHR ? (
@@ -216,6 +216,51 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Workforce Health Strip */}
+      {isHR && (
+        <Card className="card-tier-2 section-fade-in">
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold">Workforce Health</p>
+                  <span className="ai-supported-label">
+                    <Brain className="w-3 h-3" />
+                    AI-supported
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  A quick signal of stability vs. areas needing attention.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant="stable">{stableCount} stable</Badge>
+                <Badge variant="attention">{attentionCount} attention</Badge>
+                <Badge variant="critical">{criticalCount} critical</Badge>
+              </div>
+            </div>
+
+            <div className="mt-4 h-2.5 w-full rounded-full bg-muted overflow-hidden border border-border/60">
+              <div className="h-full flex">
+                <div
+                  className="h-full bg-stable"
+                  style={{ width: `${(stableCount / totalEmployees) * 100}%` }}
+                />
+                <div
+                  className="h-full bg-attention"
+                  style={{ width: `${(attentionCount / totalEmployees) * 100}%` }}
+                />
+                <div
+                  className="h-full bg-critical"
+                  style={{ width: `${(criticalCount / totalEmployees) * 100}%` }}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Main Content */}
@@ -325,6 +370,6 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

@@ -16,6 +16,7 @@ import { mockEmployees } from '@/lib/mock-data';
 import { Employee, EmployeeStatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { PageShell } from '@/components/layout/PageShell';
 
 export default function Employees() {
   const [search, setSearch] = useState('');
@@ -41,19 +42,11 @@ export default function Employees() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 section-fade-in">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Employee Directory</h1>
-          <p className="text-muted-foreground mt-1.5">
-            View and manage your team members with AI-supported insights
-          </p>
-        </div>
-        <Button>
-          Add Employee
-        </Button>
-      </div>
+    <PageShell
+      title="Employee Directory"
+      description="Browse your organization with AI-assisted summaries and health signals."
+      actions={<Button>Add Employee</Button>}
+    >
 
       {/* Filters */}
       <Card className="card-tier-1 section-fade-in">
@@ -184,6 +177,6 @@ export default function Employees() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageShell>
   );
 }
