@@ -7,35 +7,70 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { authAPI } from '@/lib/api';
 
 export default function Signup() {
-  const [name, setName] = useState('');
+  const [employeeId, setEmployeeId] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [department, setDepartment] = useState('');
+  const [position, setPosition] = useState('');
+  const [joiningYear, setJoiningYear] = useState(new Date().getFullYear().toString());
+  const [role, setRole] = useState<'EMPLOYEE' | 'HR'>('EMPLOYEE');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!name || !email || !password) {
-      setError('Please fill all fields');
+    if (!employeeId || !firstName || !lastName || !email || !password || !companyName || !phoneNumber || !department || !position) {
+      setError('Please fill all required fields');
       return;
     }
 
     setIsLoading(true);
     try {
-      const success = await signup(name, email, password);
-      if (success) {
-        navigate('/email-verification', { state: { email } });
+      const response = await authAPI.signup({
+        employeeId,
+        firstName,
+        lastName,
+        email,
+        password,
+        companyName,
+        phoneNumber,
+        department,
+        position,
+        joiningYear: parseInt(joiningYear),
+        role,
+      });
+
+      if (response.success) {
+        // Navigate to email verification with token
+        navigate('/email-verification', { 
+          state: { 
+            email,
+            token: response.data?.verificationToken 
+          } 
+        });
       } else {
-        setError('Unable to sign up. Please try again.');
+        setError(response.message || 'Unable to sign up. Please try again.');
       }
-    } catch {
-      setError('An error occurred. Please try again.');
+    } catch (err: any) {
+      const errorMessage = err?.message || 'An error occurred. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -68,20 +103,48 @@ export default function Signup() {
                 </Alert>
               )}
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name *</Label>
+                  <Input
+                    id="firstName"
+                    placeholder="Priya"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="h-11"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name *</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Sharma"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="h-11"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="employeeId">Employee ID *</Label>
                 <Input
-                  id="name"
-                  placeholder="Priya Sharma"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  id="employeeId"
+                  placeholder="EMP001"
+                  value={employeeId}
+                  onChange={(e) => setEmployeeId(e.target.value)}
                   className="h-11"
                   disabled={isLoading}
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Work Email</Label>
+                <Label htmlFor="email">Work Email *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -90,11 +153,12 @@ export default function Signup() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-11"
                   disabled={isLoading}
+                  required
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Password *</Label>
                 <Input
                   id="password"
                   type="password"
@@ -103,7 +167,92 @@ export default function Signup() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-11"
                   disabled={isLoading}
+                  required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Company Name *</Label>
+                <Input
+                  id="companyName"
+                  placeholder="Acme Corp"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="h-11"
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber">Phone Number *</Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="+91 9876543210"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="h-11"
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="department">Department *</Label>
+                  <Input
+                    id="department"
+                    placeholder="Engineering"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="h-11"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="position">Position *</Label>
+                  <Input
+                    id="position"
+                    placeholder="Software Engineer"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                    className="h-11"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="joiningYear">Joining Year *</Label>
+                  <Input
+                    id="joiningYear"
+                    type="number"
+                    placeholder="2024"
+                    value={joiningYear}
+                    onChange={(e) => setJoiningYear(e.target.value)}
+                    className="h-11"
+                    disabled={isLoading}
+                    required
+                    min="2000"
+                    max={new Date().getFullYear()}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role *</Label>
+                  <Select value={role} onValueChange={(value: 'EMPLOYEE' | 'HR') => setRole(value)} disabled={isLoading}>
+                    <SelectTrigger className="h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                      <SelectItem value="HR">HR Officer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <Button 

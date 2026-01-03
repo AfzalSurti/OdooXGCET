@@ -7,18 +7,22 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, RefreshCw, MailCheck } from 'lucide-react';
+import { authAPI } from '@/lib/api';
 
 export default function VerifyEmail() {
   const location = useLocation();
   const navigate = useNavigate();
   const { pendingEmail, verifyOtp, resendOtp } = useAuth();
 
-  const initialEmail = (location.state as { email?: string } | null)?.email || pendingEmail || '';
+  const locationState = location.state as { email?: string; token?: string } | null;
+  const initialEmail = locationState?.email || pendingEmail || '';
+  const initialToken = locationState?.token || '';
   const [email] = useState(initialEmail);
-  const [otp, setOtp] = useState('');
+  const [token, setToken] = useState(initialToken);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
     if (!email) {
@@ -37,21 +41,25 @@ export default function VerifyEmail() {
     e.preventDefault();
     setError('');
 
-    if (!otp) {
-      setError('Enter the code we sent to your email');
+    const verificationToken = token || (e.target as any).token?.value;
+    if (!verificationToken) {
+      setError('Verification token is required');
       return;
     }
 
     setIsLoading(true);
     try {
-      const ok = await verifyOtp(otp);
-      if (ok) {
-        navigate('/dashboard');
+      const response = await authAPI.verifyEmail(verificationToken);
+      if (response.success) {
+        setIsVerified(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       } else {
-        setError('Invalid code. Please try again.');
+        setError(response.message || 'Invalid token. Please try again.');
       }
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err: any) {
+      setError(err?.message || 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -82,42 +90,54 @@ export default function VerifyEmail() {
             <CardDescription>For security, please confirm your email before continuing.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleVerify} className="space-y-4">
-              {error && (
-                <Alert variant="destructive" className="animate-scale-in">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="otp">Verification code</Label>
-                <Input
-                  id="otp"
-                  inputMode="numeric"
-                  maxLength={6}
-                  placeholder="123456"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="h-11 tracking-[0.24em] text-center text-lg"
-                  disabled={isLoading}
-                />
-              </div>
-
-              <Button type="submit" className="w-full h-11" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    <MailCheck className="mr-2 h-4 w-4" />
-                    Verify & Continue
-                  </>
+            {isVerified ? (
+              <Alert className="animate-scale-in">
+                <MailCheck className="h-4 w-4" />
+                <AlertDescription>
+                  Email verified successfully! Redirecting to login...
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <form onSubmit={handleVerify} className="space-y-4">
+                {error && (
+                  <Alert variant="destructive" className="animate-scale-in">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
                 )}
-              </Button>
-            </form>
+
+                <div className="space-y-2">
+                  <Label htmlFor="token">Verification Token</Label>
+                  <Input
+                    id="token"
+                    name="token"
+                    placeholder="Enter verification token from email"
+                    value={token}
+                    onChange={(e) => setToken(e.target.value)}
+                    className="h-11"
+                    disabled={isLoading}
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Check your email for the verification token
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full h-11" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <MailCheck className="mr-2 h-4 w-4" />
+                      Verify & Continue
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
 
             <div className="flex items-center justify-between mt-6 text-sm text-muted-foreground">
               <Link to="/signup" className="hover:text-foreground">Change email</Link>

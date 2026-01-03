@@ -13,9 +13,10 @@ import {
   UserCheck,
   Brain,
 } from 'lucide-react';
-import { mockDashboardStats, mockLeaveRequests, mockEmployees } from '@/lib/mock-data';
 import { Link } from 'react-router-dom';
 import { PageShell } from '@/components/layout/PageShell';
+import { dashboardAPI, leaveAPI } from '@/lib/api';
+import { useEffect, useState } from 'react';
 
 function StatCard({ 
   title, 
@@ -74,7 +75,7 @@ function StatCard({
   );
 }
 
-function PendingLeaveItem({ request }: { request: typeof mockLeaveRequests[0] }) {
+function PendingLeaveItem({ request }: { request: any }) {
   return (
     <div className="flex items-center justify-between py-3 border-b border-border/50 last:border-0 pl-2 status-indicator-attention transition-colors duration-150 hover:bg-accent/30">
       <div className="flex-1 min-w-0">
@@ -92,43 +93,40 @@ function PendingLeaveItem({ request }: { request: typeof mockLeaveRequests[0] })
   );
 }
 
-function AttentionEmployeeItem({ employee }: { employee: typeof mockEmployees[0] }) {
-  const statusConfig = {
-    attention: { icon: AlertCircle, variant: 'attention' as const, indicator: 'status-indicator-attention' },
-    critical: { icon: AlertCircle, variant: 'critical' as const, indicator: 'status-indicator-critical' },
-    stable: { icon: CheckCircle2, variant: 'stable' as const, indicator: 'status-indicator-stable' },
-  };
-  
-  const config = statusConfig[employee.status];
-  
-  return (
-    <div className={`flex items-center gap-3 py-3 border-b border-border/50 last:border-0 pl-2 ${config.indicator} transition-colors duration-150 hover:bg-accent/30`}>
-      <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
-        <span className="text-sm font-medium">
-          {employee.name.split(' ').map(n => n[0]).join('')}
-        </span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm truncate">{employee.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5 truncate">{employee.aiSummary}</p>
-      </div>
-      <Badge variant={config.variant} className="shrink-0">
-        {employee.status}
-      </Badge>
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const { user } = useAuth();
   const isHR = user?.role === 'hr' || user?.role === 'admin';
   
-  const pendingRequests = mockLeaveRequests.filter(r => r.status === 'pending');
-  const attentionEmployees = mockEmployees.filter(e => e.status !== 'stable');
-  const stableCount = mockEmployees.filter(e => e.status === 'stable').length;
-  const attentionCount = mockEmployees.filter(e => e.status === 'attention').length;
-  const criticalCount = mockEmployees.filter(e => e.status === 'critical').length;
-  const totalEmployees = mockEmployees.length || 1;
+  const [stats, setStats] = useState<any>(null);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [statsData, leaveData, activityData] = await Promise.all([
+          dashboardAPI.getStats(user?.role || 'employee'),
+          leaveAPI.list('pending'),
+          dashboardAPI.getRecentActivity(),
+        ]);
+        
+        setStats(statsData);
+        setPendingRequests(leaveData || []);
+        setRecentActivity(activityData || []);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   return (
     <PageShell
@@ -141,31 +139,44 @@ export default function Dashboard() {
     >
 
       {/* Stats Grid */}
-      {isHR ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(isHR ? 4 : 3)].map((_, i) => (
+            <Card key={i} className="card-tier-1">
+              <CardContent className="p-5">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-muted rounded w-24 mb-2"></div>
+                  <div className="h-8 bg-muted rounded w-16"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : isHR ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Employees"
-            value={mockDashboardStats.totalEmployees}
+            value={stats?.totalEmployees || 0}
             icon={Users}
             trend="stable"
             accentColor="blue"
           />
           <StatCard
             title="Pending Approvals"
-            value={mockDashboardStats.pendingApprovals}
+            value={stats?.pendingApprovals || 0}
             icon={CalendarCheck}
             accentColor="amber"
           />
           <StatCard
             title="Today's Attendance"
-            value={mockDashboardStats.todayAttendance}
-            subtitle={`of ${mockDashboardStats.totalEmployees} employees`}
+            value={stats?.todayAttendance || 0}
+            subtitle={stats?.totalEmployees ? `of ${stats.totalEmployees} employees` : undefined}
             icon={Clock}
             accentColor="teal"
           />
           <StatCard
             title="Attendance Rate"
-            value={`${mockDashboardStats.attendanceRate}%`}
+            value={`${stats?.attendanceRate || 0}%`}
             icon={TrendingUp}
             trend="up"
             accentColor="green"
@@ -181,8 +192,14 @@ export default function Dashboard() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Check-in Status</p>
-                  <p className="text-lg font-semibold mt-1">Checked In</p>
-                  <p className="text-xs text-stable mt-0.5">08:55 AM</p>
+                  <p className="text-lg font-semibold mt-1">
+                    {stats?.checkedIn ? 'Checked In' : 'Not Checked In'}
+                  </p>
+                  {stats?.checkInTime && (
+                    <p className="text-xs text-stable mt-0.5">
+                      {new Date(stats.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -195,8 +212,8 @@ export default function Dashboard() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Leave Balance</p>
-                  <p className="text-lg font-semibold mt-1">9 days</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">3 used this year</p>
+                  <p className="text-lg font-semibold mt-1">{stats?.leaveBalance || 0} days</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Available</p>
                 </div>
               </div>
             </CardContent>
@@ -209,8 +226,8 @@ export default function Dashboard() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">This Week</p>
-                  <p className="text-lg font-semibold mt-1">32.5 hrs</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">On track</p>
+                  <p className="text-lg font-semibold mt-1">{stats?.weeklyHours || 0} hrs</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Worked</p>
                 </div>
               </div>
             </CardContent>
@@ -218,50 +235,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Workforce Health Strip */}
-      {isHR && (
-        <Card className="card-tier-2 section-fade-in">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold">Workforce Health</p>
-                  <span className="ai-supported-label">
-                    <Brain className="w-3 h-3" />
-                    AI-supported
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  A quick signal of stability vs. areas needing attention.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Badge variant="stable">{stableCount} stable</Badge>
-                <Badge variant="attention">{attentionCount} attention</Badge>
-                <Badge variant="critical">{criticalCount} critical</Badge>
-              </div>
-            </div>
-
-            <div className="mt-4 h-2.5 w-full rounded-full bg-muted overflow-hidden border border-border/60">
-              <div className="h-full flex">
-                <div
-                  className="h-full bg-stable"
-                  style={{ width: `${(stableCount / totalEmployees) * 100}%` }}
-                />
-                <div
-                  className="h-full bg-attention"
-                  style={{ width: `${(attentionCount / totalEmployees) * 100}%` }}
-                />
-                <div
-                  className="h-full bg-critical"
-                  style={{ width: `${(criticalCount / totalEmployees) * 100}%` }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -297,43 +270,6 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Employees Needing Attention */}
-        {isHR && (
-          <Card className="card-tier-2 section-fade-in">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <CardTitle className="text-lg">Areas where intervention may help this week</CardTitle>
-                    <span className="ai-supported-label">
-                      <Brain className="w-3 h-3" />
-                      AI-supported
-                    </span>
-                  </div>
-                  <CardDescription>Insights based on attendance patterns and work behavior</CardDescription>
-                </div>
-                <Link to="/employees">
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    View all <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {attentionEmployees.length > 0 ? (
-                <div>
-                  {attentionEmployees.map(employee => (
-                    <AttentionEmployeeItem key={employee.id} employee={employee} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground py-4 text-center">
-                  All employees are stable
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        )}
 
         {/* Employee View - Recent Activity */}
         {!isHR && (
@@ -343,29 +279,35 @@ export default function Dashboard() {
               <CardDescription>Attendance and leave updates from the past week</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2.5 border-b border-border/50">
-                  <div>
-                    <p className="text-sm font-medium">Check-in recorded</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Today at 8:55 AM</p>
-                  </div>
-                  <Badge variant="stable">Present</Badge>
+              {recentActivity.length > 0 ? (
+                <div className="space-y-3">
+                  {recentActivity.slice(0, 10).map((activity, idx) => (
+                    <div key={idx} className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0">
+                      <div>
+                        <p className="text-sm font-medium">{activity.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {new Date(activity.date).toLocaleDateString([], { 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                      <Badge variant={
+                        activity.status === 'approved' || activity.status === 'present' ? 'stable' :
+                        activity.status === 'pending' ? 'attention' : 'secondary'
+                      }>
+                        {activity.status}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between py-2.5 border-b border-border/50">
-                  <div>
-                    <p className="text-sm font-medium">Leave request approved</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Personal leave - Jan 20</p>
-                  </div>
-                  <Badge variant="stable">Approved</Badge>
-                </div>
-                <div className="flex items-center justify-between py-2.5">
-                  <div>
-                    <p className="text-sm font-medium">Check-out recorded</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Yesterday at 6:00 PM</p>
-                  </div>
-                  <Badge variant="secondary">8.9 hrs</Badge>
-                </div>
-              </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  No recent activity
+                </p>
+              )}
             </CardContent>
           </Card>
         )}

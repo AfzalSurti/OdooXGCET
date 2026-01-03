@@ -120,28 +120,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signup = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Mock signup: assume backend created user and sent OTP
-    await new Promise(resolve => setTimeout(resolve, 800));
-    if (name && email && password) {
-      setPendingEmail(email);
-      return true;
-    }
-    return false;
+    // This is kept for backward compatibility but signup is now handled directly in Signup page
+    // The actual signup API call is made in the Signup component
+    setPendingEmail(email);
+    return true;
   };
 
-  const verifyOtp = async (otp: string): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    // Mock: accept any non-empty OTP
-    if (pendingEmail && otp.trim().length >= 4) {
-      setUser({ ...mockCurrentUser, email: pendingEmail });
-      setPendingEmail(null);
-      return true;
+  const verifyOtp = async (token: string): Promise<boolean> => {
+    try {
+      const response = await authAPI.verifyEmail(token);
+      if (response.success) {
+        setPendingEmail(null);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Email verification error:', error);
+      return false;
     }
-    return false;
   };
 
   const resendOtp = async (): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Resend functionality would need backend support
+    // For now, return true to allow resend attempts
     return !!pendingEmail;
   };
 

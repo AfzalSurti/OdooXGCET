@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,34 +11,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter, ArrowRight, Building2, User, Brain } from 'lucide-react';
-import { mockEmployees } from '@/lib/mock-data';
-import { Employee, EmployeeStatus } from '@/lib/types';
+import { Search, Filter, ArrowRight, Building2, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { PageShell } from '@/components/layout/PageShell';
+import { employeesAPI } from '@/lib/api';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 export default function Employees() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const departments = [...new Set(mockEmployees.map(e => e.department))];
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
-  const filteredEmployees = mockEmployees.filter(employee => {
+  const fetchEmployees = async () => {
+    try {
+      setIsLoading(true);
+      setError('');
+      const data = await employeesAPI.list();
+      setEmployees(data || []);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to fetch employees');
+      console.error('Error fetching employees:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const departments = [...new Set(employees.map(e => e.department).filter(Boolean))];
+
+  const filteredEmployees = employees.filter(employee => {
+    const fullName = `${employee.firstName || ''} ${employee.lastName || ''}`.trim();
     const matchesSearch = 
-      employee.name.toLowerCase().includes(search.toLowerCase()) ||
-      employee.email.toLowerCase().includes(search.toLowerCase()) ||
-      employee.employeeId.toLowerCase().includes(search.toLowerCase());
+      fullName.toLowerCase().includes(search.toLowerCase()) ||
+      employee.email?.toLowerCase().includes(search.toLowerCase()) ||
+      employee.employeeId?.toLowerCase().includes(search.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || employee.status === statusFilter;
     const matchesDepartment = departmentFilter === 'all' || employee.department === departmentFilter;
     
-    return matchesSearch && matchesStatus && matchesDepartment;
+    return matchesSearch && matchesDepartment;
   });
 
-  const getStatusBadge = (status: EmployeeStatus) => {
-    return <Badge variant={status} className="text-xs">{status}</Badge>;
+  const getStatusBadge = (employee: any) => {
+    // Since backend doesn't have status field, we'll use a default or calculate based on other fields
+    // For now, show a default badge
+    return <Badge variant="secondary" className="text-xs">Active</Badge>;
   };
 
   return (
@@ -62,18 +86,6 @@ export default function Employees() {
               />
             </div>
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="stable">Stable</SelectItem>
-                  <SelectItem value="attention">Attention</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
               <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Department" />
@@ -90,84 +102,97 @@ export default function Employees() {
         </CardContent>
       </Card>
 
+      {error && (
+        <Alert variant="destructive" className="section-fade-in">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Employee Cards - Card-row hybrid layout */}
       <div className="space-y-3">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
-            {filteredEmployees.length} of {mockEmployees.length} employees
+            {filteredEmployees.length} of {employees.length} employees
           </p>
         </div>
 
-        {filteredEmployees.map((employee, index) => {
-          const statusIndicator = employee.status === 'stable' ? 'status-indicator-stable' : 
-                                  employee.status === 'attention' ? 'status-indicator-attention' : 
-                                  'status-indicator-critical';
-          
-          return (
-            <Card 
-              key={employee.id} 
-              className={cn(
-                "card-tier-3 overflow-hidden transition-all duration-200 ease-in-out section-fade-in",
-                statusIndicator
-              )}
-              style={{ animationDelay: `${index * 30}ms` }}
-            >
-              <CardContent className="p-0">
-                <div className="flex flex-col lg:flex-row">
-                  {/* Human Data Section */}
-                  <div className="flex-1 p-5 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center shrink-0 border border-border/50">
-                    <span className="text-base font-semibold">
-                      {employee.name.split(' ').map(n => n[0]).join('')}
-                    </span>
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <Card key={i} className="card-tier-3">
+                <CardContent className="p-5">
+                  <div className="animate-pulse flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-muted"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-muted rounded w-32"></div>
+                      <div className="h-3 bg-muted rounded w-48"></div>
+                    </div>
                   </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          filteredEmployees.map((employee, index) => {
+            const fullName = `${employee.firstName || ''} ${employee.lastName || ''}`.trim();
+            const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
+            
+            return (
+              <Card 
+                key={employee.id} 
+                className={cn(
+                  "card-tier-3 overflow-hidden transition-all duration-200 ease-in-out section-fade-in"
+                )}
+                style={{ animationDelay: `${index * 30}ms` }}
+              >
+                <CardContent className="p-0">
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Human Data Section */}
+                    <div className="flex-1 p-5 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center shrink-0 border border-border/50">
+                        <span className="text-base font-semibold">
+                          {initials}
+                        </span>
+                      </div>
+                      
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base truncate">{employee.name}</h3>
-                        <p className="text-sm text-muted-foreground truncate mt-0.5">{employee.email}</p>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1.5">
-                            <Building2 className="w-3.5 h-3.5" />
-                            <span>{employee.department}</span>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-base truncate">{fullName || 'Unknown'}</h3>
+                            <p className="text-sm text-muted-foreground truncate mt-0.5">{employee.email || 'N/A'}</p>
+                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                              {employee.department && (
+                                <div className="flex items-center gap-1.5">
+                                  <Building2 className="w-3.5 h-3.5" />
+                                  <span>{employee.department}</span>
+                                </div>
+                              )}
+                              {employee.position && (
+                                <div className="flex items-center gap-1.5">
+                                  <User className="w-3.5 h-3.5" />
+                                  <span>{employee.position}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <User className="w-3.5 h-3.5" />
-                            <span>{employee.position}</span>
+                          <div className="flex items-center gap-3 shrink-0">
+                            {getStatusBadge(employee)}
+                            <Link to={`/employees/${employee.id}`}>
+                              <Button variant="ghost" size="icon" className="h-9 w-9">
+                                <ArrowRight className="h-4 w-4" />
+                              </Button>
+                            </Link>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        {getStatusBadge(employee.status)}
-                        <Link to={`/employees/${employee.id}`}>
-                          <Button variant="ghost" size="icon" className="h-9 w-9">
-                            <ArrowRight className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Subtle Divider */}
-                <Separator orientation="vertical" className="hidden lg:block" />
-
-                {/* AI Insight Section - Visually Separated */}
-                <div className="lg:w-80 p-5 ai-section border-t lg:border-t-0 lg:border-l">
-                  <div className="flex items-start gap-2 mb-2.5">
-                    <Brain className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
-                    <span className="ai-supported-label">AI-supported insight</span>
-                  </div>
-                  <p className="text-sm text-foreground leading-relaxed">
-                    {employee.aiSummary}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          );
-        })}
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
       </div>
 
       {filteredEmployees.length === 0 && (
