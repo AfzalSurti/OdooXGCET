@@ -1,9 +1,9 @@
-import express, { type Request, type Response } from 'express';
+import express, { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticateToken, requireRole, type AuthRequest } from '../middleware/auth.middleware.js';
 import { z } from 'zod';
 
-const router = express.Router();
+const router:Router = express.Router();
 
 // All leave routes require authentication
 router.use(authenticateToken);
@@ -166,7 +166,7 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
     const isHR = req.user.role === 'HR' || req.user.role === 'ADMIN';
 
     const leaveRequest = await prisma.leaveRequest.findUnique({
-      where: { id },
+      where: { id: String(id) },
       include: {
         employee: {
           select: {
@@ -218,7 +218,7 @@ router.post('/:id/approve', requireRole('HR', 'ADMIN'), async (req: AuthRequest,
     const validatedData = approveRejectSchema.parse(req.body);
 
     const leaveRequest = await prisma.leaveRequest.findUnique({
-      where: { id }
+      where: { id: String(id) }
     });
 
     if (!leaveRequest) {
@@ -236,11 +236,12 @@ router.post('/:id/approve', requireRole('HR', 'ADMIN'), async (req: AuthRequest,
     }
 
     const updated = await prisma.leaveRequest.update({
-      where: { id },
+      where: { id: String(id) },
       data: {
-        status: 'approved',
-        approvedBy: req.user?.id,
-        approvedAt: new Date()
+        status: 'approved', 
+        approvedBy: req.user!.id, 
+        approvedAt: new Date(),
+        rejectionComment: validatedData.comment ?? null 
       },
       include: {
         employee: {
@@ -285,7 +286,7 @@ router.post('/:id/reject', requireRole('HR', 'ADMIN'), async (req: AuthRequest, 
     const validatedData = approveRejectSchema.parse(req.body);
 
     const leaveRequest = await prisma.leaveRequest.findUnique({
-      where: { id }
+      where: { id: String(id) }
     });
 
     if (!leaveRequest) {
@@ -303,12 +304,12 @@ router.post('/:id/reject', requireRole('HR', 'ADMIN'), async (req: AuthRequest, 
     }
 
     const updated = await prisma.leaveRequest.update({
-      where: { id },
+      where: { id: String(id) },
       data: {
         status: 'rejected',
-        approvedBy: req.user?.id,
+        approvedBy: req.user!.id,
         approvedAt: new Date(),
-        rejectionComment: validatedData.comment
+        rejectionComment: validatedData.comment ?? null
       },
       include: {
         employee: {
@@ -353,7 +354,7 @@ router.get('/:id/explanation', requireRole('HR', 'ADMIN'), async (req: AuthReque
     const { id } = req.params;
 
     const leaveRequest = await prisma.leaveRequest.findUnique({
-      where: { id },
+      where: { id: String(id) },
       include: {
         employee: {
           select: {

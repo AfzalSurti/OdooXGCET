@@ -1,9 +1,9 @@
-import express, { type Request, type Response } from 'express';
+import express, { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticateToken, requireRole, type AuthRequest } from '../middleware/auth.middleware.js';
 import { z } from 'zod';
 
-const router = express.Router();
+const router:Router = express.Router();
 
 // All attendance routes require authentication
 router.use(authenticateToken);
@@ -56,7 +56,7 @@ router.post('/check-in', async (req: AuthRequest, res: Response) => {
         data: {
           checkIn: now,
           status,
-          location: validatedData.location
+          location: validatedData.location ?? null // Change undefined to null
         }
       });
     } else {
@@ -67,7 +67,7 @@ router.post('/check-in', async (req: AuthRequest, res: Response) => {
           date: today,
           checkIn: now,
           status,
-          location: validatedData.location
+          location: validatedData.location ?? null // Change undefined to null
         }
       });
     }

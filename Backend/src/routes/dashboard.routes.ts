@@ -1,8 +1,8 @@
-import express, { type Request, type Response } from 'express';
+import express, { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticateToken, type AuthRequest } from '../middleware/auth.middleware.js';
 
-const router = express.Router();
+const router:Router = express.Router();
 
 // All dashboard routes require authentication
 router.use(authenticateToken);

@@ -1,9 +1,9 @@
-import express, { type Request, type Response } from 'express';
+import express, { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticateToken, requireRole, type AuthRequest } from '../middleware/auth.middleware.js';
 import { z } from 'zod';
 
-const router = express.Router();
+const router:Router = express.Router();
 
 // All payroll routes require authentication
 router.use(authenticateToken);
@@ -124,7 +124,7 @@ router.put('/:employeeId/salary', requireRole('HR', 'ADMIN'), async (req: AuthRe
 
     // Verify employee exists
     const employee = await prisma.user.findUnique({
-      where: { id: employeeId }
+      where: { id: String(employeeId) }
     });
 
     if (!employee) {
@@ -155,9 +155,9 @@ router.put('/:employeeId/salary', requireRole('HR', 'ADMIN'), async (req: AuthRe
 
     // Update or create payroll record
     const payroll = await prisma.payroll.upsert({
-      where: {
+     where: {
         employeeId_month_year: {
-          employeeId,
+          employeeId: String(employeeId),
           month,
           year
         }
@@ -176,7 +176,7 @@ router.put('/:employeeId/salary', requireRole('HR', 'ADMIN'), async (req: AuthRe
         netSalary
       },
       create: {
-        employeeId,
+        employeeId: String(employeeId),
         month,
         year,
         basicSalary,
@@ -228,7 +228,7 @@ router.get('/:payrollId/download', async (req: AuthRequest, res: Response) => {
     const { payrollId } = req.params;
 
     const payroll = await prisma.payroll.findUnique({
-      where: { id: payrollId },
+      where: { id: String(payrollId) },
       include: {
         employee: {
           select: {

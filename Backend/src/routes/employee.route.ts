@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express, { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { createEmployeeSchema } from '../validators/auth.validator.js';
 import { z } from 'zod';
@@ -6,7 +6,7 @@ import bcryptjs from 'bcryptjs';
 import { generateEmployeeId, generateRandomPassword } from '../utils/employeeid.generator.js';
 import { authenticateToken, requireRole, type AuthRequest } from '../middleware/auth.middleware.js';
 
-const router = express.Router();
+const router:Router = express.Router();
 
 // All employee routes require authentication
 router.use(authenticateToken);
@@ -144,7 +144,7 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<any> => {
     const { id } = req. params;
 
     const employee = await prisma.user.findUnique({
-      where: { id },
+      where: { id: String(id) },
       select: {
         id: true,
         employeeId: true,
@@ -197,7 +197,7 @@ router.put('/:id', async (req: AuthRequest, res: Response): Promise<any> => {
     delete updateData. createdAt;
 
     const updatedEmployee = await prisma.user.update({
-      where: { id },
+      where: { id: String(id) },
       data: updateData,
       select: {
         id: true,

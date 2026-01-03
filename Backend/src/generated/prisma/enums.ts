@@ -11,7 +11,38 @@
 
 export const Role = {
   EMPLOYEE: 'EMPLOYEE',
-  HR: 'HR'
+  HR: 'HR',
+  ADMIN: 'ADMIN'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const AttendanceStatus = {
+  present: 'present',
+  absent: 'absent',
+  late: 'late',
+  half_day: 'half_day',
+  holiday: 'holiday'
+} as const
+
+export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus]
+
+
+export const LeaveType = {
+  annual: 'annual',
+  sick: 'sick',
+  personal: 'personal',
+  unpaid: 'unpaid'
+} as const
+
+export type LeaveType = (typeof LeaveType)[keyof typeof LeaveType]
+
+
+export const LeaveStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected'
+} as const
+
+export type LeaveStatus = (typeof LeaveStatus)[keyof typeof LeaveStatus]
