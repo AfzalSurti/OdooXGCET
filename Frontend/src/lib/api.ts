@@ -17,27 +17,39 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     headers,
   });
 
+  // Parse response
+  let responseData;
+  try {
+    responseData = await response.json();
+  } catch {
+    // If response is not JSON, throw error
+    throw new Error(`Invalid response format. Status: ${response.status}`);
+  }
+
+  // Check for HTTP errors (non-2xx status codes)
   if (!response.ok) {
-    // Try to parse error response, fallback to generic message
-    let errorData;
-    try {
-      errorData = await response.json();
-    } catch {
-      errorData = { message: `HTTP error! status: ${response.status}` };
-    }
-    
     // Backend returns { success: false, message: "..." } format
-    const errorMessage = errorData.message || errorData.error || `HTTP error! status: ${response.status}`;
+    const errorMessage = responseData.message || responseData.error || `HTTP error! status: ${response.status}`;
     const error = new Error(errorMessage);
     
     // Attach status code and full error data for better error handling
     (error as any).status = response.status;
-    (error as any).data = errorData;
+    (error as any).data = responseData;
     
     throw error;
   }
 
-  return response.json();
+  // Safety check: Even with 200 status, verify success field
+  // (Backend should always return success: true for 200 responses, but this is a safety net)
+  if (responseData.success === false) {
+    const errorMessage = responseData.message || 'Request failed';
+    const error = new Error(errorMessage);
+    (error as any).status = response.status;
+    (error as any).data = responseData;
+    throw error;
+  }
+
+  return responseData;
 }
 
 // Auth API
