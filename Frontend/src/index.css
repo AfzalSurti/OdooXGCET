@@ -1,0 +1,437 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Zarvo Light Mode - Soft tinted backgrounds, not grey */
+    --background: 220 30% 98%;
+    --foreground: 220 25% 12%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+    
+    --primary: 220 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 220 25% 96%;
+    --secondary-foreground: 220 25% 20%;
+    
+    --muted: 220 20% 95%;
+    --muted-foreground: 220 15% 40%;
+    
+    --accent: 220 50% 94%;
+    --accent-foreground: 220 25% 20%;
+    
+    /* Semantic Colors */
+    --stable: 152 60% 40%;
+    --stable-foreground: 0 0% 100%;
+    --stable-muted: 152 40% 95%;
+    
+    --attention: 38 92% 50%;
+    --attention-foreground: 38 92% 15%;
+    --attention-muted: 38 80% 95%;
+    
+    --critical: 0 72% 51%;
+    --critical-foreground: 0 0% 100%;
+    --critical-muted: 0 60% 96%;
+    
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 220 70% 50%;
+    
+    --radius: 0.625rem;
+    
+    /* Chart Colors */
+    --chart-1: 152 60% 40%;
+    --chart-2: 38 92% 50%;
+    --chart-3: 200 60% 45%;
+    --chart-4: 280 60% 50%;
+    --chart-5: 0 72% 51%;
+  }
+
+  .dark {
+    /* Zarvo Dark Mode - Deep blue/indigo, color-rich */
+    --background: 220 25% 10%;
+    --foreground: 220 15% 92%;
+    
+    --card: 220 20% 14%;
+    --card-foreground: 220 15% 92%;
+    
+    --popover: 220 20% 14%;
+    --popover-foreground: 220 15% 92%;
+    
+    --primary: 220 65% 60%;
+    --primary-foreground: 220 25% 10%;
+    
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 220 15% 88%;
+    
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 10% 65%;
+    
+    --accent: 220 18% 22%;
+    --accent-foreground: 220 15% 92%;
+    
+    /* Semantic Colors - Muted for dark mode */
+    --stable: 160 50% 45%;
+    --stable-foreground: 160 50% 10%;
+    --stable-muted: 160 30% 18%;
+    
+    --attention: 38 70% 55%;
+    --attention-foreground: 38 70% 10%;
+    --attention-muted: 38 40% 18%;
+    
+    --critical: 0 60% 55%;
+    --critical-foreground: 0 0% 100%;
+    --critical-muted: 0 40% 18%;
+    
+    --destructive: 0 60% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
+    --ring: 220 65% 60%;
+    
+    /* Chart Colors */
+    --chart-1: 160 50% 45%;
+    --chart-2: 38 70% 55%;
+    --chart-3: 195 50% 55%;
+    --chart-4: 280 50% 60%;
+    --chart-5: 0 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Status Badges */
+  .badge-stable {
+    @apply bg-stable-muted text-stable border border-stable/20;
+  }
+  
+  .badge-attention {
+    @apply bg-attention-muted text-attention border border-attention/20;
+  }
+  
+  .badge-critical {
+    @apply bg-critical-muted text-critical border border-critical/20;
+  }
+  
+  /* Card Tiers - Visual Hierarchy */
+  
+  /* Tier 1: KPI Cards - Flat, compact */
+  .card-tier-1 {
+    @apply bg-card border border-border/60 rounded-lg transition-all duration-150 ease-in-out;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+  
+  .card-tier-1:hover {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+  
+  .dark .card-tier-1 {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  }
+  
+  .dark .card-tier-1:hover {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Tier 2: AI & Insight Cards - Subtle tinted background */
+  .card-tier-2 {
+    @apply border border-border/50 rounded-lg transition-all duration-200 ease-in-out;
+    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--muted) / 0.3));
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  }
+  
+  .card-tier-2:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+  }
+  
+  .dark .card-tier-2 {
+    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--muted) / 0.2));
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25), 0 1px 2px -1px rgba(0, 0, 0, 0.15);
+  }
+  
+  .dark .card-tier-2:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Tier 3: Actionable Lists - Stronger borders, more depth */
+  .card-tier-3 {
+    @apply bg-card border-2 border-border/70 rounded-lg transition-all duration-200 ease-in-out;
+    box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.08), 0 1px 3px -1px rgba(0, 0, 0, 0.04);
+  }
+  
+  .card-tier-3:hover {
+    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+    border-color: hsl(var(--border));
+  }
+  
+  .dark .card-tier-3 {
+    box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.3), 0 1px 3px -1px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark .card-tier-3:hover {
+    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* AI-Supported Label */
+  .ai-supported-label {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium;
+    background: hsl(var(--muted) / 0.6);
+    color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+  
+  .dark .ai-supported-label {
+    background: hsl(var(--muted) / 0.4);
+  }
+  
+  /* AI Section Container - Distinct tinted background */
+  .ai-section {
+    @apply rounded-lg border border-border/50;
+    background: linear-gradient(to bottom, hsl(220 40% 96%), hsl(220 35% 98%));
+    padding: 1.5rem;
+    position: relative;
+  }
+  
+  .dark .ai-section {
+    background: linear-gradient(to bottom, hsl(220 25% 18%), hsl(220 20% 16%));
+  }
+  
+  /* Status Indicators - Colored left borders */
+  .status-indicator-stable {
+    border-left: 3px solid hsl(var(--stable));
+  }
+  
+  .status-indicator-attention {
+    border-left: 3px solid hsl(var(--attention));
+  }
+  
+  .status-indicator-critical {
+    border-left: 3px solid hsl(var(--critical));
+  }
+  
+  /* KPI Card Accent Strips */
+  .kpi-accent-blue {
+    border-top: 3px solid hsl(220 70% 50%);
+  }
+  
+  .kpi-accent-green {
+    border-top: 3px solid hsl(152 60% 40%);
+  }
+  
+  .kpi-accent-amber {
+    border-top: 3px solid hsl(38 92% 50%);
+  }
+  
+  .kpi-accent-teal {
+    border-top: 3px solid hsl(180 50% 45%);
+  }
+  
+  /* Tinted Icon Backgrounds */
+  .icon-bg-primary {
+    background: hsl(220 50% 94%);
+  }
+  
+  .icon-bg-stable {
+    background: hsl(152 40% 95%);
+  }
+  
+  .icon-bg-attention {
+    background: hsl(38 80% 95%);
+  }
+  
+  .icon-bg-teal {
+    background: hsl(180 40% 94%);
+  }
+  
+  .dark .icon-bg-primary {
+    background: hsl(220 30% 20%);
+  }
+  
+  .dark .icon-bg-stable {
+    background: hsl(152 30% 18%);
+  }
+  
+  .dark .icon-bg-attention {
+    background: hsl(38 40% 18%);
+  }
+  
+  .dark .icon-bg-teal {
+    background: hsl(180 30% 20%);
+  }
+  
+  /* Cards with subtle hover and depth */
+  .zarvo-card {
+    @apply bg-card border border-border rounded-lg transition-all duration-200 ease-in-out card-elevation-1;
+  }
+  
+  .zarvo-card:hover {
+    @apply card-elevation-2 border-border/80;
+    transform: translateY(-2px);
+  }
+  
+  /* AI Insight card - neutral background */
+  .ai-insight-card {
+    @apply bg-muted/30 border border-border rounded-lg;
+  }
+  
+  /* Data tables */
+  .data-table-row {
+    @apply transition-colors duration-150 ease-out hover:bg-muted/50;
+  }
+  
+  /* Smooth page transitions - fade + vertical shift */
+  .page-enter {
+    animation: pageEnter 180ms ease-in-out forwards;
+  }
+  
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Section fade-in for staggered effect */
+  .section-fade-in {
+    animation: sectionFadeIn 200ms ease-in-out forwards;
+    animation-delay: 50ms;
+    opacity: 0;
+  }
+  
+  @keyframes sectionFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(3px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Panel slide animations - slide + fade */
+  .panel-slide-in {
+    animation: panelSlide 220ms ease-in-out forwards;
+  }
+  
+  @keyframes panelSlide {
+    from {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* Card hover - micro-elevation */
+  .card-hover {
+    transition: all 200ms ease-in-out;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  }
+  
+  .dark .card-hover:hover {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Section expand/collapse - smooth height animation */
+  .section-expand {
+    transition: height 200ms ease-in-out, opacity 200ms ease-in-out;
+  }
+  
+  /* AI-supported label */
+  .ai-supported {
+    @apply text-xs text-muted-foreground font-medium;
+  }
+  
+  /* Card depth levels - Enhanced for light mode */
+  .card-elevation-1 {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  }
+  
+  .card-elevation-2 {
+    box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .card-elevation-3 {
+    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.1), 0 3px 6px -2px rgba(0, 0, 0, 0.06);
+  }
+  
+  .dark .card-elevation-1 {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.15);
+  }
+  
+  .dark .card-elevation-2 {
+    box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.18);
+  }
+  
+  .dark .card-elevation-3 {
+    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.35), 0 3px 6px -2px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* Skeleton loading */
+  .skeleton-pulse {
+    @apply bg-muted animate-pulse rounded;
+  }
+  
+  /* Focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+  }
+}
+
+@layer utilities {
+  /* Tracking for numeric data */
+  .tracking-data {
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Smooth transitions */
+  .transition-zarvo {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
