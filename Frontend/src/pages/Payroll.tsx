@@ -28,7 +28,7 @@ export default function Payroll() {
   const netSalary = grossSalary - totalDeductions;
 
   if (isHR) {
-    return (
+  return (
       <PageShell
         title="Payroll"
         description="Payroll overview for all employees with salary details."
@@ -58,8 +58,8 @@ export default function Payroll() {
                       <p className="font-semibold tracking-data">Net: ₹{netSalary.toLocaleString('en-IN')}</p>
                       <p className="text-xs text-muted-foreground">
                         Gross ₹{grossSalary.toLocaleString('en-IN')} • Ded. ₹{totalDeductions.toLocaleString('en-IN')}
-                      </p>
-                    </div>
+          </p>
+        </div>
                     <Button variant="outline" size="sm" className="gap-2">
                       <Download className="w-4 h-4" />
                       Payslip
