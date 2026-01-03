@@ -32,14 +32,9 @@ export default function Login() {
         navigate('/dashboard');
       }
     } catch (error: any) {
-      // Handle specific error messages from API
+      // Handle error messages from API
       const errorMessage = error?.message || 'An error occurred. Please try again.';
       setError(errorMessage);
-      
-      // If email not verified, show specific message
-      if (errorMessage.includes('Email not verified')) {
-        setError('Please verify your email before logging in. Check your inbox for the verification link.');
-      }
     } finally {
       setIsLoading(false);
     }

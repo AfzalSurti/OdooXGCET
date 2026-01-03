@@ -115,7 +115,6 @@ router.post('/signup', async (req: Request, res: Response) => {
 /**
  * POST /api/auth/login
  * User login endpoint
- * Requires email verification before login
  * Returns JWT token on success
  */
 router.post('/login', async (req: Request, res: Response) => {
@@ -135,8 +134,7 @@ router.post('/login', async (req: Request, res: Response) => {
       });
     }
 
-    // Verify password first (before checking email verification)
-    // This prevents timing attacks that could reveal if an email exists
+    // Verify password
     const isPasswordValid = await bcryptjs.compare(validatedData.password, user.passwordHash);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -145,16 +143,7 @@ router.post('/login', async (req: Request, res: Response) => {
       });
     }
 
-    // Check if email is verified (only after password is verified)
-    if (!user.emailVerified) {
-      return res.status(403).json({
-        success: false,
-        message: 'Email not verified. Please verify your email before logging in.',
-        requiresVerification: true
-      });
-    }
-
-    // Generate JWT token
+    // Generate JWT token (no email verification required)
     const token = jwt.sign(
       { 
         userId: user.id, 
