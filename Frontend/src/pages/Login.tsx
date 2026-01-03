@@ -30,11 +30,16 @@ export default function Login() {
       const success = await login(email, password);
       if (success) {
         navigate('/dashboard');
-      } else {
-        setError('Invalid credentials');
       }
-    } catch {
-      setError('An error occurred. Please try again.');
+    } catch (error: any) {
+      // Handle specific error messages from API
+      const errorMessage = error?.message || 'An error occurred. Please try again.';
+      setError(errorMessage);
+      
+      // If email not verified, show specific message
+      if (errorMessage.includes('Email not verified')) {
+        setError('Please verify your email before logging in. Check your inbox for the verification link.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -110,9 +115,6 @@ export default function Login() {
               </Button>
             </form>
 
-            <p className="text-center text-sm text-muted-foreground mt-6">
-              Demo: Enter any email and password to login
-            </p>
           </CardContent>
         </Card>
       </div>

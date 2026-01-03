@@ -18,8 +18,23 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    // Try to parse error response, fallback to generic message
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { message: `HTTP error! status: ${response.status}` };
+    }
+    
+    // Backend returns { success: false, message: "..." } format
+    const errorMessage = errorData.message || errorData.error || `HTTP error! status: ${response.status}`;
+    const error = new Error(errorMessage);
+    
+    // Attach status code and full error data for better error handling
+    (error as any).status = response.status;
+    (error as any).data = errorData;
+    
+    throw error;
   }
 
   return response.json();
@@ -28,20 +43,37 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
-    const data = await fetchAPI('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-    if (data.token) {
-      localStorage.setItem('zarvo_token', data.token);
+    try {
+      const data = await fetchAPI('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+      if (data.success && data.data?.token) {
+        localStorage.setItem('zarvo_token', data.data.token);
+      }
+      return data;
+    } catch (error: any) {
+      // Re-throw with proper error message from API
+      throw error;
     }
-    return data;
   },
 
-  signup: async (employeeId: string, email: string, password: string, role: string) => {
+  signup: async (data: {
+    employeeId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    companyName: string;
+    phoneNumber: string;
+    department: string;
+    position: string;
+    joiningYear: number;
+    role: 'EMPLOYEE' | 'HR' | 'ADMIN';
+  }) => {
     return fetchAPI('/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({ employeeId, email, password, role }),
+      body: JSON.stringify(data),
     });
   },
 
@@ -58,44 +90,79 @@ export const authAPI = {
 };
 
 // Employees API
+// Backend returns: { success: true, data: Employee[] | Employee | { employeeId, password, employee } }
 export const employeesAPI = {
   list: async () => {
-    return fetchAPI('/employees');
+    const response = await fetchAPI('/employees');
+    // Backend returns { success: true, data: Employee[] }
+    return response.success ? response.data : [];
   },
 
   getById: async (id: string) => {
-    return fetchAPI(`/employees/${id}`);
+    const response = await fetchAPI(`/employees/${id}`);
+    // Backend returns { success: true, data: Employee }
+    return response.success ? response.data : null;
+  },
+
+  create: async (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    companyName: string;
+    phoneNumber: string;
+    department: string;
+    position: string;
+    joiningYear: number;
+    role?: 'EMPLOYEE' | 'HR' | 'ADMIN';
+  }) => {
+    const response = await fetchAPI('/employees/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    // Backend returns { success: true, message: string, data: { employeeId, password, employee } }
+    return response.success ? response.data : null;
   },
 
   update: async (id: string, data: any) => {
-    return fetchAPI(`/employees/${id}`, {
+    const response = await fetchAPI(`/employees/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    // Backend returns { success: true, message: string, data: Employee }
+    return response.success ? response.data : null;
   },
 };
 
 // Attendance API
+// Backend returns: { success: true, data: Attendance | Attendance[] }
 export const attendanceAPI = {
   checkIn: async (location?: string) => {
-    return fetchAPI('/attendance/check-in', {
+    const response = await fetchAPI('/attendance/check-in', {
       method: 'POST',
       body: JSON.stringify({ location }),
     });
+    // Backend returns { success: true, message: string, data: Attendance }
+    return response.success ? response.data : null;
   },
 
   checkOut: async () => {
-    return fetchAPI('/attendance/check-out', {
+    const response = await fetchAPI('/attendance/check-out', {
       method: 'POST',
     });
+    // Backend returns { success: true, message: string, data: Attendance }
+    return response.success ? response.data : null;
   },
 
   getToday: async () => {
-    return fetchAPI('/attendance/today');
+    const response = await fetchAPI('/attendance/today');
+    // Backend returns { success: true, data: Attendance | null }
+    return response.success ? response.data : null;
   },
 
   getWeekly: async () => {
-    return fetchAPI('/attendance/weekly');
+    const response = await fetchAPI('/attendance/weekly');
+    // Backend returns { success: true, data: Attendance[] }
+    return response.success ? response.data : [];
   },
 
   getHistory: async (employeeId?: string, startDate?: string, endDate?: string) => {
@@ -103,18 +170,23 @@ export const attendanceAPI = {
     if (employeeId) params.append('employeeId', employeeId);
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
-    return fetchAPI(`/attendance?${params.toString()}`);
+    const response = await fetchAPI(`/attendance?${params.toString()}`);
+    // Backend returns { success: true, data: Attendance[] }
+    return response.success ? response.data : [];
   },
 
   getLogs: async (employeeId: string, startDate?: string, endDate?: string) => {
     const params = new URLSearchParams();
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
-    return fetchAPI(`/attendance/${employeeId}/logs?${params.toString()}`);
+    const response = await fetchAPI(`/attendance/${employeeId}/logs?${params.toString()}`);
+    // Backend returns { success: true, data: Attendance[] }
+    return response.success ? response.data : [];
   },
 };
 
 // Leave API
+// Backend returns: { success: true, data: LeaveRequest | LeaveRequest[] | AIExplanation }
 export const leaveAPI = {
   apply: async (data: {
     type: string;
@@ -122,90 +194,128 @@ export const leaveAPI = {
     endDate: string;
     reason: string;
   }) => {
-    return fetchAPI('/leaves', {
+    const response = await fetchAPI('/leaves', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    // Backend returns { success: true, message: string, data: LeaveRequest }
+    return response.success ? response.data : null;
   },
 
   list: async (status?: string, employeeId?: string) => {
     const params = new URLSearchParams();
     if (status) params.append('status', status);
     if (employeeId) params.append('employeeId', employeeId);
-    return fetchAPI(`/leaves?${params.toString()}`);
+    const response = await fetchAPI(`/leaves?${params.toString()}`);
+    // Backend returns { success: true, data: LeaveRequest[] } (already transformed)
+    return response.success ? response.data : [];
   },
 
   getById: async (id: string) => {
-    return fetchAPI(`/leaves/${id}`);
+    const response = await fetchAPI(`/leaves/${id}`);
+    // Backend returns { success: true, data: LeaveRequest }
+    return response.success ? response.data : null;
   },
 
   approve: async (id: string, comment?: string) => {
-    return fetchAPI(`/leaves/${id}/approve`, {
+    const response = await fetchAPI(`/leaves/${id}/approve`, {
       method: 'POST',
       body: JSON.stringify({ comment }),
     });
+    // Backend returns { success: true, message: string, data: LeaveRequest }
+    return response.success ? response.data : null;
   },
 
   reject: async (id: string, comment?: string) => {
-    return fetchAPI(`/leaves/${id}/reject`, {
+    const response = await fetchAPI(`/leaves/${id}/reject`, {
       method: 'POST',
       body: JSON.stringify({ comment }),
     });
+    // Backend returns { success: true, message: string, data: LeaveRequest }
+    return response.success ? response.data : null;
   },
 
   getExplanation: async (leaveRequestId: string) => {
-    return fetchAPI(`/leaves/${leaveRequestId}/explanation`);
+    const response = await fetchAPI(`/leaves/${leaveRequestId}/explanation`);
+    // Backend returns { success: true, data: AIExplanation }
+    return response.success ? response.data : null;
   },
 };
 
 // Payroll API
+// Backend returns: { success: true, data: Payroll | Payroll[] }
 export const payrollAPI = {
   getMyPayroll: async (month?: number, year?: number) => {
     const params = new URLSearchParams();
     if (month) params.append('month', month.toString());
     if (year) params.append('year', year.toString());
-    return fetchAPI(`/payroll/my?${params.toString()}`);
+    const response = await fetchAPI(`/payroll/my?${params.toString()}`);
+    // Backend returns { success: true, data: Payroll | null, message?: string }
+    return response.success ? response.data : null;
   },
 
   getAll: async (month?: number, year?: number) => {
     const params = new URLSearchParams();
     if (month) params.append('month', month.toString());
     if (year) params.append('year', year.toString());
-    return fetchAPI(`/payroll?${params.toString()}`);
+    const response = await fetchAPI(`/payroll?${params.toString()}`);
+    // Backend returns { success: true, data: Payroll[] }
+    return response.success ? response.data : [];
   },
 
   updateSalary: async (employeeId: string, data: any) => {
-    return fetchAPI(`/payroll/${employeeId}/salary`, {
+    const response = await fetchAPI(`/payroll/${employeeId}/salary`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    // Backend returns { success: true, message: string, data: Payroll }
+    return response.success ? response.data : null;
   },
 
   downloadPayslip: async (payrollId: string) => {
     const response = await fetch(`${API_BASE_URL}/payroll/${payrollId}/download`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('zarvo_token')}`,
+        'Content-Type': 'application/json',
       },
     });
-    if (!response.ok) throw new Error('Failed to download payslip');
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `payslip-${payrollId}.pdf`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Failed to download payslip' }));
+      throw new Error(error.message || 'Failed to download payslip');
+    }
+    // Backend currently returns JSON, but in production would return PDF
+    // For now, handle JSON response
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+      const data = await response.json();
+      // Return the payroll data for now
+      return data.success ? data.data : null;
+    } else {
+      // Handle PDF blob when implemented
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `payslip-${payrollId}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
   },
 };
 
 // Dashboard API
+// Backend returns: { success: true, data: DashboardStats | Activity[] }
 export const dashboardAPI = {
   getStats: async (role: string) => {
-    return fetchAPI(`/dashboard/stats?role=${role}`);
+    const response = await fetchAPI(`/dashboard/stats?role=${role}`);
+    // Backend returns { success: true, data: { totalEmployees, pendingApprovals, ... } | { checkedIn, weeklyHours, ... } }
+    return response.success ? response.data : null;
   },
 
   getRecentActivity: async () => {
-    return fetchAPI('/dashboard/activity');
+    const response = await fetchAPI('/dashboard/activity');
+    // Backend returns { success: true, data: Activity[] }
+    return response.success ? response.data : [];
   },
 };
 
