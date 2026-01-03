@@ -1,22 +1,43 @@
 import { z } from 'zod';
 
-const passwordSchema = z.string()
-  .min(8, 'Password must be at least 8 characters long')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number')
-  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character');
-
 export const signUpSchema = z.object({
   employeeId: z.string().min(1, 'Employee ID is required').trim(),
-  email: z.email('Invalid email format').toLowerCase().trim(),
-  password: passwordSchema,
-  companyName: z.string().min(1, 'Company name is required').trim(),
+  firstName: z.string().min(1, 'First name is required').trim(),
+  lastName: z.string().min(1, 'Last name is required').trim(),
+  email: z.string().email('Invalid email address').trim().toLowerCase(),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  companyName: z.string().min(2, 'Company name must be at least 2 characters').trim(),
   phoneNumber: z.string()
-    .min(10, 'Phone number must be at least 10 digits')
-    .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/, 'Invalid phone number format')
+    .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Invalid phone number format')
     .trim(),
-  role: z.enum(['EMPLOYEE', 'HR'], { message: 'Role must be either EMPLOYEE or HR' })
+  department: z.string().min(1, 'Department is required').trim(),
+  position: z.string().min(1, 'Position is required').trim(),
+  joiningYear: z.number().int().min(2000).max(new Date().getFullYear() + 1),
+  role: z.enum(['EMPLOYEE', 'HR', 'ADMIN'], { message: 'Role must be EMPLOYEE, HR, or ADMIN' })
+});
+
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email address').trim().toLowerCase(),
+  password: z.string().min(1, 'Password is required')
+});
+
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, 'Verification token is required')
+});
+
+export const createEmployeeSchema = z.object({
+  firstName: z.string().min(1, 'First name is required').trim(),
+  lastName: z.string().min(1, 'Last name is required').trim(),
+  email: z.string().email('Invalid email address').trim().toLowerCase(),
+  companyName: z.string().min(2, 'Company name must be at least 2 characters').trim(),
+  phoneNumber: z.string()
+    .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]? [0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Invalid phone number format')
+    .trim(),
+  department: z.string().min(1, 'Department is required').trim(),
+  position: z.string().min(1, 'Position is required').trim(),
+  joiningYear: z.number().int().min(2000).max(new Date().getFullYear() + 1),
+  role: z.enum(['EMPLOYEE', 'HR', 'ADMIN']).default('EMPLOYEE')
 });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
+export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;

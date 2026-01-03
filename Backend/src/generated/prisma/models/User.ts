@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  joiningYear: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  joiningYear: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -29,8 +39,13 @@ export type UserMinAggregateOutputType = {
   employeeId: string | null
   email: string | null
   passwordHash: string | null
+  firstName: string | null
+  lastName: string | null
   companyName: string | null
   phoneNumber: string | null
+  department: string | null
+  position: string | null
+  joiningYear: number | null
   role: $Enums.Role | null
   emailVerified: boolean | null
   emailVerifyToken: string | null
@@ -44,8 +59,13 @@ export type UserMaxAggregateOutputType = {
   employeeId: string | null
   email: string | null
   passwordHash: string | null
+  firstName: string | null
+  lastName: string | null
   companyName: string | null
   phoneNumber: string | null
+  department: string | null
+  position: string | null
+  joiningYear: number | null
   role: $Enums.Role | null
   emailVerified: boolean | null
   emailVerifyToken: string | null
@@ -59,8 +79,13 @@ export type UserCountAggregateOutputType = {
   employeeId: number
   email: number
   passwordHash: number
+  firstName: number
+  lastName: number
   companyName: number
   phoneNumber: number
+  department: number
+  position: number
+  joiningYear: number
   role: number
   emailVerified: number
   emailVerifyToken: number
@@ -71,13 +96,26 @@ export type UserCountAggregateOutputType = {
 }
 
 
+export type UserAvgAggregateInputType = {
+  joiningYear?: true
+}
+
+export type UserSumAggregateInputType = {
+  joiningYear?: true
+}
+
 export type UserMinAggregateInputType = {
   id?: true
   employeeId?: true
   email?: true
   passwordHash?: true
+  firstName?: true
+  lastName?: true
   companyName?: true
   phoneNumber?: true
+  department?: true
+  position?: true
+  joiningYear?: true
   role?: true
   emailVerified?: true
   emailVerifyToken?: true
@@ -91,8 +129,13 @@ export type UserMaxAggregateInputType = {
   employeeId?: true
   email?: true
   passwordHash?: true
+  firstName?: true
+  lastName?: true
   companyName?: true
   phoneNumber?: true
+  department?: true
+  position?: true
+  joiningYear?: true
   role?: true
   emailVerified?: true
   emailVerifyToken?: true
@@ -106,8 +149,13 @@ export type UserCountAggregateInputType = {
   employeeId?: true
   email?: true
   passwordHash?: true
+  firstName?: true
+  lastName?: true
   companyName?: true
   phoneNumber?: true
+  department?: true
+  position?: true
+  joiningYear?: true
   role?: true
   emailVerified?: true
   emailVerifyToken?: true
@@ -155,6 +203,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -185,6 +245,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -194,8 +256,13 @@ export type UserGroupByOutputType = {
   employeeId: string
   email: string
   passwordHash: string
+  firstName: string
+  lastName: string
   companyName: string
   phoneNumber: string
+  department: string
+  position: string
+  joiningYear: number
   role: $Enums.Role
   emailVerified: boolean
   emailVerifyToken: string | null
@@ -203,6 +270,8 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -230,8 +299,13 @@ export type UserWhereInput = {
   employeeId?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
+  firstName?: Prisma.StringFilter<"User"> | string
+  lastName?: Prisma.StringFilter<"User"> | string
   companyName?: Prisma.StringFilter<"User"> | string
   phoneNumber?: Prisma.StringFilter<"User"> | string
+  department?: Prisma.StringFilter<"User"> | string
+  position?: Prisma.StringFilter<"User"> | string
+  joiningYear?: Prisma.IntFilter<"User"> | number
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   emailVerifyToken?: Prisma.StringNullableFilter<"User"> | string | null
@@ -245,8 +319,13 @@ export type UserOrderByWithRelationInput = {
   employeeId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
+  department?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  joiningYear?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifyToken?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -263,8 +342,13 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringFilter<"User"> | string
+  firstName?: Prisma.StringFilter<"User"> | string
+  lastName?: Prisma.StringFilter<"User"> | string
   companyName?: Prisma.StringFilter<"User"> | string
   phoneNumber?: Prisma.StringFilter<"User"> | string
+  department?: Prisma.StringFilter<"User"> | string
+  position?: Prisma.StringFilter<"User"> | string
+  joiningYear?: Prisma.IntFilter<"User"> | number
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   emailVerifyToken?: Prisma.StringNullableFilter<"User"> | string | null
@@ -278,8 +362,13 @@ export type UserOrderByWithAggregationInput = {
   employeeId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
+  department?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  joiningYear?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifyToken?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -287,8 +376,10 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -299,8 +390,13 @@ export type UserScalarWhereWithAggregatesInput = {
   employeeId?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
+  firstName?: Prisma.StringWithAggregatesFilter<"User"> | string
+  lastName?: Prisma.StringWithAggregatesFilter<"User"> | string
   companyName?: Prisma.StringWithAggregatesFilter<"User"> | string
   phoneNumber?: Prisma.StringWithAggregatesFilter<"User"> | string
+  department?: Prisma.StringWithAggregatesFilter<"User"> | string
+  position?: Prisma.StringWithAggregatesFilter<"User"> | string
+  joiningYear?: Prisma.IntWithAggregatesFilter<"User"> | number
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   emailVerifyToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -314,8 +410,13 @@ export type UserCreateInput = {
   employeeId: string
   email: string
   passwordHash: string
+  firstName: string
+  lastName: string
   companyName: string
   phoneNumber: string
+  department: string
+  position: string
+  joiningYear: number
   role?: $Enums.Role
   emailVerified?: boolean
   emailVerifyToken?: string | null
@@ -329,8 +430,13 @@ export type UserUncheckedCreateInput = {
   employeeId: string
   email: string
   passwordHash: string
+  firstName: string
+  lastName: string
   companyName: string
   phoneNumber: string
+  department: string
+  position: string
+  joiningYear: number
   role?: $Enums.Role
   emailVerified?: boolean
   emailVerifyToken?: string | null
@@ -344,8 +450,13 @@ export type UserUpdateInput = {
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  joiningYear?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -359,8 +470,13 @@ export type UserUncheckedUpdateInput = {
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  joiningYear?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -374,8 +490,13 @@ export type UserCreateManyInput = {
   employeeId: string
   email: string
   passwordHash: string
+  firstName: string
+  lastName: string
   companyName: string
   phoneNumber: string
+  department: string
+  position: string
+  joiningYear: number
   role?: $Enums.Role
   emailVerified?: boolean
   emailVerifyToken?: string | null
@@ -389,8 +510,13 @@ export type UserUpdateManyMutationInput = {
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  joiningYear?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -404,8 +530,13 @@ export type UserUncheckedUpdateManyInput = {
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  joiningYear?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -419,8 +550,13 @@ export type UserCountOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
+  department?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  joiningYear?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifyToken?: Prisma.SortOrder
@@ -429,13 +565,22 @@ export type UserCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type UserAvgOrderByAggregateInput = {
+  joiningYear?: Prisma.SortOrder
+}
+
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
+  department?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  joiningYear?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifyToken?: Prisma.SortOrder
@@ -449,8 +594,13 @@ export type UserMinOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
+  department?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  joiningYear?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifyToken?: Prisma.SortOrder
@@ -459,8 +609,20 @@ export type UserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type UserSumOrderByAggregateInput = {
+  joiningYear?: Prisma.SortOrder
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type EnumRoleFieldUpdateOperationsInput = {
@@ -490,8 +652,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   employeeId?: boolean
   email?: boolean
   passwordHash?: boolean
+  firstName?: boolean
+  lastName?: boolean
   companyName?: boolean
   phoneNumber?: boolean
+  department?: boolean
+  position?: boolean
+  joiningYear?: boolean
   role?: boolean
   emailVerified?: boolean
   emailVerifyToken?: boolean
@@ -505,8 +672,13 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   employeeId?: boolean
   email?: boolean
   passwordHash?: boolean
+  firstName?: boolean
+  lastName?: boolean
   companyName?: boolean
   phoneNumber?: boolean
+  department?: boolean
+  position?: boolean
+  joiningYear?: boolean
   role?: boolean
   emailVerified?: boolean
   emailVerifyToken?: boolean
@@ -520,8 +692,13 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   employeeId?: boolean
   email?: boolean
   passwordHash?: boolean
+  firstName?: boolean
+  lastName?: boolean
   companyName?: boolean
   phoneNumber?: boolean
+  department?: boolean
+  position?: boolean
+  joiningYear?: boolean
   role?: boolean
   emailVerified?: boolean
   emailVerifyToken?: boolean
@@ -535,8 +712,13 @@ export type UserSelectScalar = {
   employeeId?: boolean
   email?: boolean
   passwordHash?: boolean
+  firstName?: boolean
+  lastName?: boolean
   companyName?: boolean
   phoneNumber?: boolean
+  department?: boolean
+  position?: boolean
+  joiningYear?: boolean
   role?: boolean
   emailVerified?: boolean
   emailVerifyToken?: boolean
@@ -545,7 +727,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "email" | "passwordHash" | "companyName" | "phoneNumber" | "role" | "emailVerified" | "emailVerifyToken" | "emailVerifyExpires" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "email" | "passwordHash" | "firstName" | "lastName" | "companyName" | "phoneNumber" | "department" | "position" | "joiningYear" | "role" | "emailVerified" | "emailVerifyToken" | "emailVerifyExpires" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -555,8 +737,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     employeeId: string
     email: string
     passwordHash: string
+    firstName: string
+    lastName: string
     companyName: string
     phoneNumber: string
+    department: string
+    position: string
+    joiningYear: number
     role: $Enums.Role
     emailVerified: boolean
     emailVerifyToken: string | null
@@ -990,8 +1177,13 @@ export interface UserFieldRefs {
   readonly employeeId: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
+  readonly firstName: Prisma.FieldRef<"User", 'String'>
+  readonly lastName: Prisma.FieldRef<"User", 'String'>
   readonly companyName: Prisma.FieldRef<"User", 'String'>
   readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
+  readonly department: Prisma.FieldRef<"User", 'String'>
+  readonly position: Prisma.FieldRef<"User", 'String'>
+  readonly joiningYear: Prisma.FieldRef<"User", 'Int'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly emailVerifyToken: Prisma.FieldRef<"User", 'String'>

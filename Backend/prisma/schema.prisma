@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   EMPLOYEE
   HR
+  ADMIN
 }
 
 model User {
@@ -17,15 +18,111 @@ model User {
   employeeId         String    @unique
   email              String    @unique
   passwordHash       String
+  firstName          String
+  lastName           String
   companyName        String
   phoneNumber        String
+  department         String
+  position           String
+  joiningYear        Int
 
   role               Role      @default(EMPLOYEE)
 
   emailVerified      Boolean   @default(false)
-  emailVerifyToken   String?
-  emailVerifyExpires DateTime?
+  emailVerifyToken   String? 
+  emailVerifyExpires DateTime? 
 
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+
+  // Relations
+  attendanceRecords  Attendance[]
+  leaveRequests      LeaveRequest[]
+  payrollRecords     Payroll[]
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  late
+  half_day
+  holiday
+}
+
+model Attendance {
+  id          String            @id @default(uuid())
+  employeeId  String
+  date        DateTime          @default(now())
+  checkIn     DateTime?
+  checkOut    DateTime?
+  status      AttendanceStatus  @default(present)
+  workHours   Float?
+  location    String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  employee    User              @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, date])
+  @@index([date])
+}
+
+enum LeaveType {
+  annual
+  sick
+  personal
+  unpaid
+}
+
+enum LeaveStatus {
+  pending
+  approved
+  rejected
+}
+
+model LeaveRequest {
+  id            String      @id @default(uuid())
+  employeeId    String
+  type          LeaveType
+  startDate     DateTime
+  endDate       DateTime
+  reason        String
+  status        LeaveStatus @default(pending)
+  approvedBy    String?
+  approvedAt    DateTime?
+  rejectionComment String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  employee      User        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([status])
+}
+
+model Payroll {
+  id                String    @id @default(uuid())
+  employeeId        String
+  month             Int
+  year              Int
+  basicSalary       Float
+  housingAllowance  Float      @default(0)
+  transportAllowance Float     @default(0)
+  medicalAllowance  Float      @default(0)
+  performanceBonus  Float      @default(0)
+  incomeTax         Float      @default(0)
+  healthInsurance   Float      @default(0)
+  providentFund     Float      @default(0)
+  grossSalary       Float
+  totalDeductions   Float
+  netSalary         Float
+  paidAt            DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  employee          User      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, month, year])
+  @@index([employeeId])
+  @@index([year, month])
 }
