@@ -1,45 +1,38 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
-// #region agent log - hypothesis A: Check if Link is defined
-fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:3',message:'Checking Link availability after fix',data:{linkDefined: typeof Link !== 'undefined', linkType: typeof Link},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-// #endregion
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 
-export default function Login() {
-  // #region agent log - hypothesis B: Component initialization
-  fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:11',message:'Login component initialized after fix',data:{component:'Login', linkAvailable: typeof Link !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
-
+export default function Signup() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    if (!email || !password) {
-      setError('Please enter both email and password');
+
+    if (!name || !email || !password) {
+      setError('Please fill all fields');
       return;
     }
 
     setIsLoading(true);
     try {
-      const success = await login(email, password);
+      const success = await signup(name, email, password);
       if (success) {
-        navigate('/dashboard');
+        navigate('/email-verification', { state: { email } });
       } else {
-        setError('Invalid credentials');
+        setError('Unable to sign up. Please try again.');
       }
     } catch {
       setError('An error occurred. Please try again.');
@@ -48,27 +41,22 @@ export default function Login() {
     }
   };
 
-  // #region agent log - hypothesis D: About to return JSX
-  fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:43',message:'About to return JSX after fix',data:{returningJSX: true, linkAvailable: typeof Link !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'D'})}).catch(()=>{});
-  // #endregion
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-border mb-4 overflow-hidden animate-scale-in">
             <img src="/logo.png" alt="Logo" className="w-16 h-16 object-contain" />
           </div>
-          <h1 className="text-2xl font-semibold text-foreground">Welcome to Zarvo</h1>
-          <p className="text-muted-foreground mt-1">Secure access to your workday</p>
+          <h1 className="text-2xl font-semibold text-foreground">Create your account</h1>
+          <p className="text-muted-foreground mt-1">Join Zarvo and get started</p>
         </div>
 
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl">Sign in</CardTitle>
+            <CardTitle className="text-xl">Sign up</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Enter your details to create an account
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -79,9 +67,21 @@ export default function Login() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Priya Sharma"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-11"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Work Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -114,24 +114,20 @@ export default function Login() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    Creating account...
                   </>
                 ) : (
-                  'Sign in'
+                  'Create account'
                 )}
               </Button>
             </form>
 
-            <div className="text-center text-sm text-muted-foreground mt-6 space-y-2">
-              <p className="text-foreground/70">Need an account?</p>
-              {/* #region agent log - hypothesis C: Before Link usage */}
-              {(() => {
-                fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:115',message:'About to render Link component after fix',data:{linkType: typeof Link, linkToRender: true, linkFunction: typeof Link === 'function'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-                return null;
-              })()}
-              {/* #endregion */}
-              <Link to="/signup" className="text-primary hover:underline">Create one</Link>
-              <p className="text-muted-foreground">Demo: Enter any email and password to login</p>
+            <div className="flex items-center justify-between mt-6 text-sm text-muted-foreground">
+              <Link to="/login" className="inline-flex items-center gap-1 hover:text-foreground">
+                <ArrowLeft className="w-4 h-4" />
+                Back to login
+              </Link>
+              <span>Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link></span>
             </div>
           </CardContent>
         </Card>
@@ -139,3 +135,5 @@ export default function Login() {
     </div>
   );
 }
+
+
