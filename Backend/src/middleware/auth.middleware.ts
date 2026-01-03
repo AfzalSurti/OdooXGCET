@@ -35,7 +35,7 @@ export async function authenticateToken(
       return;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string; role?: string };
     
     // Verify user still exists and is email verified
     const user = await prisma.user.findUnique({

@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
-// #region agent log - hypothesis A: Check if Link is defined
-fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:3',message:'Checking Link availability after fix',data:{linkDefined: typeof Link !== 'undefined', linkType: typeof Link},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-// #endregion
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,10 +9,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function Login() {
-  // #region agent log - hypothesis B: Component initialization
-  fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:11',message:'Login component initialized after fix',data:{component:'Login', linkAvailable: typeof Link !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -38,19 +30,20 @@ export default function Login() {
       const success = await login(email, password);
       if (success) {
         navigate('/dashboard');
-      } else {
-        setError('Invalid credentials');
       }
-    } catch {
-      setError('An error occurred. Please try again.');
+    } catch (error: any) {
+      // Handle specific error messages from API
+      const errorMessage = error?.message || 'An error occurred. Please try again.';
+      setError(errorMessage);
+      
+      // If email not verified, show specific message
+      if (errorMessage.includes('Email not verified')) {
+        setError('Please verify your email before logging in. Check your inbox for the verification link.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
-  // #region agent log - hypothesis D: About to return JSX
-  fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:43',message:'About to return JSX after fix',data:{returningJSX: true, linkAvailable: typeof Link !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'D'})}).catch(()=>{});
-  // #endregion
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -124,12 +117,6 @@ export default function Login() {
 
             <div className="text-center text-sm text-muted-foreground mt-6 space-y-2">
               <p className="text-foreground/70">Need an account?</p>
-              {/* #region agent log - hypothesis C: Before Link usage */}
-              {(() => {
-                fetch('http://127.0.0.1:7242/ingest/5fb08d89-e93b-41e9-8c99-b3288f09b8a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.tsx:115',message:'About to render Link component after fix',data:{linkType: typeof Link, linkToRender: true, linkFunction: typeof Link === 'function'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-                return null;
-              })()}
-              {/* #endregion */}
               <Link to="/signup" className="text-primary hover:underline">Create one</Link>
               <p className="text-muted-foreground">Demo: Enter any email and password to login</p>
             </div>

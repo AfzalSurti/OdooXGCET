@@ -128,13 +128,15 @@ router.post('/login', async (req: Request, res: Response) => {
     });
 
     if (!user) {
+      // Return generic error to prevent email enumeration
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
       });
     }
 
-    // Verify password
+    // Verify password first (before checking email verification)
+    // This prevents timing attacks that could reveal if an email exists
     const isPasswordValid = await bcryptjs.compare(validatedData.password, user.passwordHash);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -143,7 +145,7 @@ router.post('/login', async (req: Request, res: Response) => {
       });
     }
 
-    // Check if email is verified
+    // Check if email is verified (only after password is verified)
     if (!user.emailVerified) {
       return res.status(403).json({
         success: false,
@@ -225,6 +227,14 @@ router.post('/verify-email', async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired verification token'
+      });
+    }
+
+    // Check if email is already verified
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already verified. You can login now.'
       });
     }
 
