@@ -4,19 +4,31 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin } from 'lucide-react';
 import { mockAttendanceRecords } from '@/lib/mock-data';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { PageShell } from '@/components/layout/PageShell';
 
 export default function Attendance() {
   const { user } = useAuth();
   const [isCheckedIn, setIsCheckedIn] = useState(true);
   const [checkInTime] = useState('08:55 AM');
+  const isHR = user?.role === 'hr' || user?.role === 'admin';
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   const handleCheckAction = () => {
     setIsCheckedIn(!isCheckedIn);
   };
 
-  const recentRecords = mockAttendanceRecords.slice(0, 10);
+  const visibleRecords = isHR
+    ? mockAttendanceRecords
+    : mockAttendanceRecords.filter(r => r.employeeId === user?.employeeId);
+
+  const recentRecords = visibleRecords.slice(0, 10);
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { variant: 'stable' | 'attention' | 'critical' | 'secondary' }> = {
@@ -30,14 +42,11 @@ export default function Attendance() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="section-fade-in">
-        <h1 className="text-2xl font-semibold text-foreground">Attendance</h1>
-        <p className="text-muted-foreground mt-1.5">
-          Track your daily check-ins and work hours
-        </p>
-      </div>
+    <PageShell
+      title="Attendance"
+      description={isHR ? "A clear view of check-ins, absences, and patterns." : "Your live status and attendance history at a glance."}
+      maxWidthClassName="max-w-5xl"
+    >
 
       {/* Check In/Out Card */}
       <Card className="card-tier-3 section-fade-in">
@@ -64,10 +73,10 @@ export default function Attendance() {
             <div className="flex items-center gap-4">
               <div className="text-center">
                 <p className="text-3xl font-semibold tracking-data">
-                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {new Date().toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
+                  {now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
                 </p>
               </div>
 
@@ -152,6 +161,6 @@ export default function Attendance() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageShell>
   );
 }

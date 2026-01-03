@@ -5,22 +5,20 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Moon, Sun, Bell, Lock, User } from 'lucide-react';
+import { PageShell } from '@/components/layout/PageShell';
 
 export default function Settings() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your account preferences
-        </p>
-      </div>
+    <PageShell
+      title="Settings"
+      description="Manage your preferences with calm defaults and safe controls."
+      maxWidthClassName="max-w-3xl"
+    >
 
       {/* Appearance */}
-      <Card>
+      <Card className="card-tier-1">
         <CardHeader>
           <div className="flex items-center gap-2">
             {theme === 'light' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -46,7 +44,7 @@ export default function Settings() {
       </Card>
 
       {/* Notifications */}
-      <Card>
+      <Card className="card-tier-1">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5" />
@@ -78,7 +76,7 @@ export default function Settings() {
       </Card>
 
       {/* Security */}
-      <Card>
+      <Card className="card-tier-1">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Lock className="w-5 h-5" />
@@ -112,7 +110,7 @@ export default function Settings() {
       </Card>
 
       {/* Profile */}
-      <Card>
+      <Card className="card-tier-1">
         <CardHeader>
           <div className="flex items-center gap-2">
             <User className="w-5 h-5" />
@@ -124,6 +122,6 @@ export default function Settings() {
           <Button variant="outline">Edit Profile</Button>
         </CardContent>
       </Card>
-    </div>
+    </PageShell>
   );
 }

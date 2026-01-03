@@ -66,6 +66,12 @@ export default {
           foreground: "hsl(var(--critical-foreground))",
           muted: "hsl(var(--critical-muted))",
         },
+        // Brand accent (teal) for insights / AI hints
+        insight: {
+          DEFAULT: "hsl(var(--insight))",
+          foreground: "hsl(var(--insight-foreground))",
+          muted: "hsl(var(--insight-muted))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

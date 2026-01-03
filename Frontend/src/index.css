@@ -6,49 +6,56 @@
 
 @layer base {
   :root {
-    /* Zarvo Light Mode - Soft tinted backgrounds, not grey */
-    --background: 220 30% 98%;
-    --foreground: 220 25% 12%;
+    /* Zarvo Design System (Light) — Human clarity meets operational intelligence */
+    /* Neutrals (from spec) */
+    --background: 219 46% 98%;      /* #F7F9FC */
+    --foreground: 223 14% 11%;      /* #0F172A */
     
-    --card: 0 0% 100%;
-    --card-foreground: 220 25% 12%;
+    --card: 0 0% 100%;             /* #FFFFFF */
+    --card-foreground: 223 14% 11%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 12%;
+    --popover-foreground: 223 14% 11%;
     
-    --primary: 220 70% 50%;
+    /* Brand */
+    --primary: 219 74% 53%;         /* Zarvo Blue #2D6CDF */
     --primary-foreground: 0 0% 100%;
+    --insight: 174 62% 48%;         /* Accent Teal #2EC4B6 */
+    --insight-foreground: 0 0% 100%;
+    --insight-muted: 174 45% 95%;
     
-    --secondary: 220 25% 96%;
-    --secondary-foreground: 220 25% 20%;
+    /* Surfaces */
+    --secondary: 220 24% 96%;
+    --secondary-foreground: 223 14% 16%;
     
-    --muted: 220 20% 95%;
-    --muted-foreground: 220 15% 40%;
+    --muted: 220 20% 96%;
+    --muted-foreground: 215 16% 47%; /* Text Secondary #64748B */
     
-    --accent: 220 50% 94%;
-    --accent-foreground: 220 25% 20%;
+    --accent: 219 46% 96%;
+    --accent-foreground: 223 14% 16%;
     
     /* Semantic Colors */
-    --stable: 152 60% 40%;
+    --stable: 148 61% 47%;          /* Success Green #2FBF71 */
     --stable-foreground: 0 0% 100%;
-    --stable-muted: 152 40% 95%;
+    --stable-muted: 148 45% 95%;
     
-    --attention: 38 92% 50%;
-    --attention-foreground: 38 92% 15%;
-    --attention-muted: 38 80% 95%;
+    --attention: 44 100% 48%;       /* Warning Amber #F4B400 */
+    --attention-foreground: 44 100% 14%;
+    --attention-muted: 44 80% 95%;
     
-    --critical: 0 72% 51%;
+    --critical: 8 76% 57%;          /* Critical Red #E5533D */
     --critical-foreground: 0 0% 100%;
-    --critical-muted: 0 60% 96%;
+    --critical-muted: 8 60% 96%;
     
-    --destructive: 0 72% 51%;
+    --destructive: 8 76% 57%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 220 20% 88%;
-    --input: 220 20% 88%;
-    --ring: 220 70% 50%;
+    --border: 214 30% 92%;          /* #E5EAF1 */
+    --input: 214 30% 92%;
+    --ring: 219 74% 53%;
     
-    --radius: 0.625rem;
+    /* Corners (14–16px) */
+    --radius: 1rem;
     
     /* Chart Colors */
     --chart-1: 152 60% 40%;
@@ -59,47 +66,51 @@
   }
 
   .dark {
-    /* Zarvo Dark Mode - Deep blue/indigo, color-rich */
-    --background: 220 25% 10%;
-    --foreground: 220 15% 92%;
+    /* Zarvo Design System (Dark) — designed, not inverted */
+    --background: 220 10% 8%;       /* #0B1220 */
+    --foreground: 220 13% 91%;      /* #E5E7EB */
     
-    --card: 220 20% 14%;
-    --card-foreground: 220 15% 92%;
+    --card: 221 11% 11%;            /* #111827 */
+    --card-foreground: 220 13% 91%;
     
-    --popover: 220 20% 14%;
-    --popover-foreground: 220 15% 92%;
+    --popover: 221 11% 11%;
+    --popover-foreground: 220 13% 91%;
     
-    --primary: 220 65% 60%;
-    --primary-foreground: 220 25% 10%;
+    /* Brand (slightly muted saturation in dark) */
+    --primary: 219 65% 58%;
+    --primary-foreground: 220 10% 8%;
+    --insight: 174 50% 44%;
+    --insight-foreground: 220 10% 8%;
+    --insight-muted: 174 30% 18%;
     
-    --secondary: 220 18% 18%;
-    --secondary-foreground: 220 15% 88%;
+    --secondary: 221 12% 14%;
+    --secondary-foreground: 220 13% 91%;
     
-    --muted: 220 15% 20%;
-    --muted-foreground: 220 10% 65%;
+    --muted: 221 12% 16%;
+    --muted-foreground: 220 10% 70%;
     
-    --accent: 220 18% 22%;
-    --accent-foreground: 220 15% 92%;
+    --accent: 221 12% 18%;
+    --accent-foreground: 220 13% 91%;
     
     /* Semantic Colors - Muted for dark mode */
-    --stable: 160 50% 45%;
-    --stable-foreground: 160 50% 10%;
-    --stable-muted: 160 30% 18%;
+    --stable: 148 55% 45%;
+    --stable-foreground: 220 10% 8%;
+    --stable-muted: 148 25% 18%;
     
-    --attention: 38 70% 55%;
-    --attention-foreground: 38 70% 10%;
-    --attention-muted: 38 40% 18%;
+    --attention: 44 90% 55%;
+    --attention-foreground: 220 10% 8%;
+    --attention-muted: 44 30% 18%;
     
-    --critical: 0 60% 55%;
+    --critical: 8 70% 55%;
     --critical-foreground: 0 0% 100%;
-    --critical-muted: 0 40% 18%;
+    --critical-muted: 8 30% 18%;
     
-    --destructive: 0 60% 55%;
+    --destructive: 8 70% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 220 15% 25%;
-    --input: 220 15% 25%;
-    --ring: 220 65% 60%;
+    --border: 221 12% 22%;
+    --input: 221 12% 22%;
+    --ring: 219 65% 58%;
     
     /* Chart Colors */
     --chart-1: 160 50% 45%;
@@ -118,6 +129,18 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.5;
+    background-image:
+      radial-gradient(circle at 20% 20%, hsl(var(--primary) / 0.06), transparent 28%),
+      radial-gradient(circle at 80% -10%, hsl(var(--insight) / 0.08), transparent 32%),
+      linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+    min-height: 100vh;
+  }
+  .dark body {
+    background-image:
+      radial-gradient(circle at 20% 20%, hsl(var(--primary) / 0.10), transparent 30%),
+      radial-gradient(circle at 80% -10%, hsl(var(--insight) / 0.12), transparent 34%),
+      linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -143,62 +166,67 @@
   
   /* Tier 1: KPI Cards - Flat, compact */
   .card-tier-1 {
-    @apply bg-card border border-border/60 rounded-lg transition-all duration-150 ease-in-out;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    @apply bg-card border border-border/70 rounded-2xl transition-all duration-200 ease-out;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
   }
   
   .card-tier-1:hover {
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.06);
     transform: translateY(-1px);
+    border-color: hsl(var(--primary) / 0.25);
   }
   
   .dark .card-tier-1 {
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.35);
   }
   
   .dark .card-tier-1:hover {
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+    border-color: hsl(var(--primary) / 0.25);
   }
   
   /* Tier 2: AI & Insight Cards - Subtle tinted background */
   .card-tier-2 {
-    @apply border border-border/50 rounded-lg transition-all duration-200 ease-in-out;
-    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--muted) / 0.3));
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+    @apply border border-border/60 rounded-2xl transition-all duration-200 ease-out;
+    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--insight) / 0.06));
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
   }
   
   .card-tier-2:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.06);
     transform: translateY(-2px);
+    border-color: hsl(var(--insight) / 0.25);
   }
   
   .dark .card-tier-2 {
-    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--muted) / 0.2));
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25), 0 1px 2px -1px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--insight) / 0.08));
+    box-shadow: 0 10px 32px rgba(0,0,0,0.35);
   }
   
   .dark .card-tier-2:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+    border-color: hsl(var(--insight) / 0.25);
   }
   
   /* Tier 3: Actionable Lists - Stronger borders, more depth */
   .card-tier-3 {
-    @apply bg-card border-2 border-border/70 rounded-lg transition-all duration-200 ease-in-out;
-    box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.08), 0 1px 3px -1px rgba(0, 0, 0, 0.04);
+    @apply bg-card border border-border/70 rounded-2xl transition-all duration-200 ease-out;
+    box-shadow: 0 10px 34px rgba(0,0,0,0.05);
   }
   
   .card-tier-3:hover {
-    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.07);
     transform: translateY(-2px);
-    border-color: hsl(var(--border));
+    border-color: hsl(var(--primary) / 0.25);
   }
   
   .dark .card-tier-3 {
-    box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.3), 0 1px 3px -1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 38px rgba(0,0,0,0.45);
   }
   
   .dark .card-tier-3:hover {
-    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 16px 44px rgba(0,0,0,0.55);
+    border-color: hsl(var(--primary) / 0.25);
   }
   
   /* AI-Supported Label */
@@ -215,14 +243,14 @@
   
   /* AI Section Container - Distinct tinted background */
   .ai-section {
-    @apply rounded-lg border border-border/50;
-    background: linear-gradient(to bottom, hsl(220 40% 96%), hsl(220 35% 98%));
+    @apply rounded-2xl border border-border/60;
+    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--insight) / 0.05));
     padding: 1.5rem;
     position: relative;
   }
   
   .dark .ai-section {
-    background: linear-gradient(to bottom, hsl(220 25% 18%), hsl(220 20% 16%));
+    background: linear-gradient(to bottom, hsl(var(--card)), hsl(var(--insight) / 0.08));
   }
   
   /* Status Indicators - Colored left borders */
@@ -252,7 +280,7 @@
   }
   
   .kpi-accent-teal {
-    border-top: 3px solid hsl(180 50% 45%);
+    border-top: 3px solid hsl(var(--insight));
   }
   
   /* Tinted Icon Backgrounds */
@@ -269,7 +297,7 @@
   }
   
   .icon-bg-teal {
-    background: hsl(180 40% 94%);
+    background: hsl(var(--insight) / 0.10);
   }
   
   .dark .icon-bg-primary {
@@ -285,7 +313,7 @@
   }
   
   .dark .icon-bg-teal {
-    background: hsl(180 30% 20%);
+    background: hsl(var(--insight) / 0.18);
   }
   
   /* Cards with subtle hover and depth */
@@ -370,6 +398,11 @@
   
   .dark .card-hover:hover {
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Glass hero wrapper */
+  .glass-hero {
+    @apply rounded-2xl border border-border/60 bg-card/80 backdrop-blur-lg shadow-[0_20px_60px_-25px_rgba(15,23,42,0.35)] p-6 sm:p-7 transition-all duration-200;
   }
   
   /* Section expand/collapse - smooth height animation */

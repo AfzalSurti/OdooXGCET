@@ -45,11 +45,11 @@ export default function Login() {
       <div className="w-full max-w-md animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary mb-4">
-            <span className="text-primary-foreground font-bold text-2xl">Z</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-border mb-4 overflow-hidden animate-scale-in">
+            <img src="/logo.png" alt="Logo" className="w-16 h-16 object-contain" />
           </div>
           <h1 className="text-2xl font-semibold text-foreground">Welcome to Zarvo</h1>
-          <p className="text-muted-foreground mt-1">Enterprise Human Resource Management</p>
+          <p className="text-muted-foreground mt-1">Secure access to your workday</p>
         </div>
 
         <Card>

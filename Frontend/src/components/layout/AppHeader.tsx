@@ -23,7 +23,7 @@ export function AppHeader() {
     .join('')
     .toUpperCase();
 
-  const roleLabel = user.role === 'hr' ? 'HR' : user.role === 'admin' ? 'Admin' : 'Employee';
+  const roleLabel = user.role === 'hr' || user.role === 'admin' ? 'HR' : 'Employee';
 
   return (
     <header className="h-16 border-b border-border bg-background/80 backdrop-blur-sm flex items-center justify-between px-6">
@@ -61,10 +61,7 @@ export function AppHeader() {
               <UserCheck className="mr-2 h-4 w-4" />
               <span>HR View</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => switchRole('admin')}>
-              <Shield className="mr-2 h-4 w-4" />
-              <span>Admin View</span>
-            </DropdownMenuItem>
+            {/* Admin merged into HR view */}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" />

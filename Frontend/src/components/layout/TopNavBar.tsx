@@ -34,15 +34,6 @@ import { LogOut, User, Shield, UserCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 
-const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: Users, label: 'Employees', path: '/employees' },
-  { icon: Clock, label: 'Attendance', path: '/attendance' },
-  { icon: CalendarDays, label: 'Leave', path: '/leave' },
-  { icon: Wallet, label: 'Payroll', path: '/payroll' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
-];
-
 export function TopNavBar() {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
@@ -57,11 +48,26 @@ export function TopNavBar() {
     .join('')
     .toUpperCase();
 
-  const roleLabel = user.role === 'hr' ? 'HR' : user.role === 'admin' ? 'Admin' : 'Employee';
+  const roleLabel = user.role === 'hr' || user.role === 'admin' ? 'HR' : 'Employee';
+  const isEmployee = user.role === 'employee';
+
+  // Role-aware nav:
+  // - Employee: no Employee Directory; instead show "My Profile"
+  // - HR/Admin: show Employee Directory
+  const navItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    ...(isEmployee
+      ? [{ icon: User, label: 'My Profile', path: `/employees/${user.id}` }]
+      : [{ icon: Users, label: 'Employees', path: '/employees' }]),
+    { icon: Clock, label: 'Attendance', path: '/attendance' },
+    { icon: CalendarDays, label: isEmployee ? 'My Leave' : 'Leave', path: '/leave' },
+    { icon: Wallet, label: 'Payroll', path: '/payroll' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-background/95 via-background/92 to-primary/5 backdrop-blur-md shadow-[0_10px_35px_-18px_rgba(15,23,42,0.35)]">
+      <div className="flex h-[72px] items-center justify-between px-4 sm:px-6">
         {/* Left: Logo & Mobile Menu */}
         <div className="flex items-center gap-4 sm:gap-8">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -74,8 +80,8 @@ export function TopNavBar() {
             <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0">
               <SheetHeader className="p-6 border-b border-border">
                 <SheetTitle className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-                    <span className="text-primary-foreground font-bold text-sm">Z</span>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-border flex items-center justify-center shadow-sm overflow-hidden">
+                    <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
                   </div>
                   <span className="font-semibold text-lg">Zarvo</span>
                 </SheetTitle>
@@ -91,10 +97,10 @@ export function TopNavBar() {
                       to={item.path}
                       onClick={() => setMobileMenuOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out",
+                        "flex items-center gap-3 px-3.5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ease-in-out",
                         isActive
-                          ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                          ? "bg-primary/10 text-foreground border border-primary/20 shadow-sm"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent/60"
                       )}
                     >
                       <item.icon className="w-4 h-4" />
@@ -107,14 +113,14 @@ export function TopNavBar() {
           </Sheet>
 
           <Link to="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-              <span className="text-primary-foreground font-bold text-sm">Z</span>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-border flex items-center justify-center shadow-sm overflow-hidden">
+              <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             </div>
             <span className="font-semibold text-lg text-foreground hidden sm:inline">Zarvo</span>
           </Link>
 
           {/* Primary Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-2 bg-secondary/60 border border-border/60 rounded-full px-2 py-1 shadow-[0_8px_22px_-12px_rgba(15,23,42,0.25)]">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path || 
                 (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
@@ -124,10 +130,10 @@ export function TopNavBar() {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ease-in-out",
+                    "flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out",
                     isActive
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      ? "bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(45,108,223,0.25)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/70"
                   )}
                 >
                   <item.icon className="w-4 h-4" />
@@ -185,10 +191,7 @@ export function TopNavBar() {
                 <UserCheck className="mr-2 h-4 w-4" />
                 <span>HR View</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => switchRole('admin')}>
-                <Shield className="mr-2 h-4 w-4" />
-                <span>Admin View</span>
-              </DropdownMenuItem>
+              {/* Admin merged into HR view */}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" />

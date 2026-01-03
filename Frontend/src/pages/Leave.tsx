@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Sheet,
   SheetContent,
@@ -29,6 +30,7 @@ import {
 import { mockLeaveRequests } from '@/lib/mock-data';
 import { LeaveRequest, LeaveStatus, AIExplanation } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { PageShell } from '@/components/layout/PageShell';
 
 function ImpactIndicator({ impact }: { impact: 'positive' | 'negative' | 'neutral' }) {
   if (impact === 'positive') return <ThumbsUp className="w-4 h-4 text-stable" />;
@@ -103,9 +105,11 @@ function ExplanationPanel({
 function LeaveRequestCard({ 
   request,
   onExplain,
+  isHR,
 }: { 
   request: LeaveRequest;
   onExplain: () => void;
+  isHR: boolean;
 }) {
   const [comment, setComment] = useState('');
 
@@ -162,7 +166,7 @@ function LeaveRequestCard({
             <p className="text-sm mt-1">{request.reason}</p>
           </div>
 
-          {request.status === 'pending' && (
+          {isHR && request.status === 'pending' && (
             <>
               <div className="mt-4">
                 <Textarea
@@ -206,11 +210,17 @@ function LeaveRequestCard({
 }
 
 export default function Leave() {
+  const { user } = useAuth();
+  const isHR = user?.role === 'hr' || user?.role === 'admin';
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedExplanation, setSelectedExplanation] = useState<AIExplanation | undefined>();
   const [showExplanation, setShowExplanation] = useState(false);
 
-  const filteredRequests = mockLeaveRequests.filter(
+  const roleFilteredRequests = isHR
+    ? mockLeaveRequests
+    : mockLeaveRequests.filter(r => r.employeeId === user?.employeeId);
+
+  const filteredRequests = roleFilteredRequests.filter(
     r => statusFilter === 'all' || r.status === statusFilter
   );
 
@@ -220,17 +230,16 @@ export default function Leave() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 section-fade-in">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Leave Management</h1>
-          <p className="text-muted-foreground mt-1.5">
-            Review leave applications with AI-supported decision insights
-          </p>
-        </div>
-        <Button>Request Leave</Button>
-      </div>
+    <PageShell
+      title={isHR ? "Leave Management" : "My Leave"}
+      description={
+        isHR
+          ? "Review leave applications with AI-supported decision insights."
+          : "Request time off and track approvals in one calm view."
+      }
+      actions={<Button>Request Leave</Button>}
+      maxWidthClassName="max-w-5xl"
+    >
 
       {/* Filter */}
       <Card className="card-tier-1 section-fade-in">
@@ -259,6 +268,7 @@ export default function Leave() {
             key={request.id} 
             request={request}
             onExplain={() => handleExplain(request)}
+            isHR={isHR}
           />
         ))}
       </div>
@@ -277,6 +287,6 @@ export default function Leave() {
         isOpen={showExplanation}
         onClose={() => setShowExplanation(false)}
       />
-    </div>
+    </PageShell>
   );
 }

@@ -44,15 +44,15 @@ export function AppSidebar() {
       )}>
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">Z</span>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-sidebar-border flex items-center justify-center overflow-hidden">
+              <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             </div>
             <span className="font-semibold text-lg text-sidebar-foreground">Zarvo</span>
           </div>
         )}
         {collapsed && (
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">Z</span>
+          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-sidebar-border flex items-center justify-center overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
           </div>
         )}
       </div>
