@@ -9,8 +9,8 @@ export interface PrismaClientConstructor {
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Tests
-   * const tests = await prisma.test.findMany()
+   * // Fetch zero or more Users
+   * const users = await prisma.user.findMany()
    * ```
    *
    * Read more in our [docs](https://pris.ly/d/client).
@@ -26,8 +26,8 @@ export interface PrismaClientConstructor {
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Tests
- * const tests = await prisma.test.findMany()
+ * // Fetch zero or more Users
+ * const users = await prisma.user.findMany()
  * ```
  *
  * Read more in our [docs](https://pris.ly/d/client).
@@ -112,14 +112,14 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
         extArgs: ExtArgs;
     }>>;
     /**
- * `prisma.test`: Exposes CRUD operations for the **Test** model.
+ * `prisma.user`: Exposes CRUD operations for the **User** model.
   * Example usage:
   * ```ts
-  * // Fetch zero or more Tests
-  * const tests = await prisma.test.findMany()
+  * // Fetch zero or more Users
+  * const users = await prisma.user.findMany()
   * ```
   */
-    get test(): Prisma.TestDelegate<ExtArgs, {
+    get user(): Prisma.UserDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
 }
